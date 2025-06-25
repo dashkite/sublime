@@ -8,9 +8,21 @@ importers:
 
   .:
     dependencies:
+      '@dashkite/generic':
+        specifier: link:../generic
+        version: link:../generic
+      '@dashkite/http-headers':
+        specifier: link:../http-headers
+        version: link:../http-headers
       '@dashkite/joy':
         specifier: link:../joy
         version: link:../joy
+      '@dashkite/media-type':
+        specifier: link:../media-type
+        version: link:../media-type
+      statuses:
+        specifier: ^2.0.2
+        version: 2.0.2
     devDependencies:
       '@dashkite/amen':
         specifier: ^0.2.0
@@ -33,6 +45,12 @@ importers:
       '@dashkite/genie-module':
         specifier: link:../genie-module
         version: link:../genie-module
+      '@dashkite/genie-yaml':
+        specifier: link:../genie-yaml
+        version: link:../genie-yaml
+      '@dashkite/runner':
+        specifier: link:../runner
+        version: link:../runner
 
 packages:
 
@@ -66,6 +84,10 @@ packages:
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
+
+  statuses@2.0.2:
+    resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
+    engines: {node: '>= 0.8'}
 
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
@@ -101,6 +123,8 @@ snapshots:
   color-name@1.1.4: {}
 
   has-flag@4.0.0: {}
+
+  statuses@2.0.2: {}
 
   supports-color@7.2.0:
     dependencies:

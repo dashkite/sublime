@@ -23,7 +23,24 @@
       "node": "./build/node/src/index.js"
     }
   },
-  "main": "build/node/src/index.js",
+  "imports": {
+    "#headers/*": {
+      "browser": "./build/browser/src/headers/*.js",
+      "node": "./build/node/src/headers/*.js"
+    },
+    "#content/*": {
+      "browser": "./build/browser/src/content/*.js",
+      "node": "./build/node/src/content/*.js"
+    },
+    "#request": {
+      "browser": "./build/browser/src/request/index.js",
+      "node": "./build/node/src/request/index.js"
+    },
+    "#response": {
+      "browser": "./build/browser/src/response/index.js",
+      "node": "./build/node/src/response/index.js"
+    }
+  },
   "files": [
     "build/browser/src",
     "build/node/src"
@@ -39,9 +56,15 @@
     "@dashkite/genie": "link:../genie",
     "@dashkite/genie-clean": "link:../genie-clean",
     "@dashkite/genie-coffee": "link:../genie-coffee",
-    "@dashkite/genie-module": "link:../genie-module"
+    "@dashkite/genie-module": "link:../genie-module",
+    "@dashkite/genie-yaml": "link:../genie-yaml",
+    "@dashkite/runner": "link:../runner"
   },
   "dependencies": {
-    "@dashkite/joy": "link:../joy"
+    "@dashkite/generic": "link:../generic",
+    "@dashkite/http-headers": "link:../http-headers",
+    "@dashkite/joy": "link:../joy",
+    "@dashkite/media-type": "link:../media-type",
+    "statuses": "^2.0.2"
   }
 }

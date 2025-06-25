@@ -1,0 +1,186 @@
+- name: Request
+  scenarios:
+
+    - name: simple
+      url: "https://foobar.com/hello?name=world"
+
+      assertions:
+
+        - path: $.url.toString()
+          type: equal
+          expect: "https://foobar.com/hello?name=world"
+
+        - path: $.method
+          type: equal
+          expect: get
+
+        - path: $.origin
+          type: equal
+          expect: "https://foobar.com"
+
+        - path: $.domain
+          type: equal
+          expect: "foobar.com"
+
+        - path: $.target
+          type: equal
+          expect: "/hello?name=world"
+
+        - path: $.query
+          type: deepEqual
+          expect:
+            name: world
+
+    - name: with method
+      url: "https://foobar.com/hello?name=world"
+      method: "POST"
+
+      assertions:
+
+        - path: $.origin
+          type: equal
+          expect: "https://foobar.com"
+
+        - path: $.target
+          type: equal
+          expect: "/hello?name=world"
+
+        - path: $.method
+          type: equal
+          expect: post
+
+    - name: with headers
+      url: "https://foobar.com/hello?name=world"
+      method: POST
+      content: hello
+      headers:
+        Content-Type:
+          type: text
+          subtype: plain
+
+
+      assertions:
+
+        - path: $.headers.get 'content-type'
+          type: deepEqual
+          expect:
+            type: text
+            subtype: plain
+
+        # - path: $.headers.encoded.get 'content-type'
+        #   type: deepEqual
+        #   expect: text/plain
+
+- name: Response
+  scenarios:
+
+    - name: status as text
+      request:
+        url: "https://foobar.com/hello?name=world"            
+      status: "200"
+      assertions:          
+        - path: $.status
+          type: equal
+          expect: 200
+        - path: $.description
+          type: equal
+          expect: ok
+
+    - name: status as number
+      request:
+        url: "https://foobar.com/hello?name=world"            
+      status: 200
+      assertions:          
+        - path: $.status
+          type: equal
+          expect: 200
+
+    - name: description only
+      request:
+        url: "https://foobar.com/hello?name=world"            
+      description: ok
+      assertions:          
+        - path: $.status
+          type: equal
+          expect: 200
+
+    - name: content only
+      request:
+        url: "https://foobar.com/hello?name=world"            
+      content: hello
+      assertions:          
+        - path: $.status
+          type: equal
+          expect: 200
+
+    - name: not found
+      request:
+        url: "https://foobar.com/hello?name=world"            
+      description: "not found"
+      assertions:          
+        - path: $.status
+          type: equal
+          expect: 404
+        - path: $.description
+          type: equal
+          expect: not found
+
+    - name: no content
+      request:
+        url: "https://foobar.com/hello?name=world"            
+      assertions:          
+        - path: $.status
+          type: equal
+          expect: 204
+        - path: $.description
+          type: equal
+          expect: no content
+
+    - name: content as text
+      request:
+        url: "https://foobar.com/hello?name=world" 
+        headers:
+          accept:
+            - type: text
+              subtype: plain
+      content: hello   
+      assertions:          
+        - path: $.status
+          type: equal
+          expect: 200
+        - path: $.description
+          type: equal
+          expect: ok
+        - path: $.headers.get 'content-length'
+          type: equal
+          expect: 5
+        - path: $.content
+          type: equal
+          expect: hello
+
+    - name: content as object
+      request:
+        url: "https://foobar.com/hello?name=world" 
+        headers:
+          accept:
+            - type: application
+              subtype: json
+      content:
+        greeting: hello   
+      assertions:          
+        - path: $.status
+          type: equal
+          expect: 200
+        - path: $.description
+          type: equal
+          expect: ok
+        - path: $.headers.get 'content-length'
+          type: equal
+          expect: 20
+        - path: $.content
+          type: equal
+          expect: '{"greeting":"hello"}'
+
+
+
+
