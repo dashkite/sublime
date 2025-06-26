@@ -181,6 +181,19 @@
           type: equal
           expect: '{"greeting":"hello"}'
 
+- name: Sky Request
+  scenarios:
+    - name: simple request
+      input:
+        resource:
+          origin: "http://localhost:3000"
+          name: hello
+          bindings:
+            name: dan
+      assertions:
+        - path: $.url.toString()
+          type: equal
+          expect: "http://localhost:3000/hello/dan"
 
 
 

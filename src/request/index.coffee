@@ -6,11 +6,9 @@ import rulebase from "./rules"
 
 class Request extends metaclass()
 
-  @make: ({ url, method, content, headers } = {}) ->
+  @make: ( input = {}) ->
     Object.assign ( new @ ), 
-      await rulebase.apply
-        input: { url, method, content, headers }
-        output: {}
+      await rulebase.apply { input, output: {}}
 
   update: ( mutator ) ->
     mutator @input

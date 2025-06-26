@@ -5,11 +5,9 @@ import rulebase from "./rules"
 
 class Response extends metaclass()
 
-  @make: ({ request, status, description, headers, content } = {}) ->
+  @make: ( input = {}) ->
     Object.assign ( new @ ), 
-      await rulebase.apply
-        input: { request, status, description, headers, content }
-        output: {}
+      await rulebase.apply { input, output: {}}
 
   @getters
 

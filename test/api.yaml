@@ -1,0 +1,9 @@
+resources:
+
+  hello:
+    template: /hello/{name}
+    methods:
+      get:
+        response:
+          content-type: [ application/json ]
+          status: [ 200 ]

@@ -10,7 +10,8 @@ rulebase =
   apply: ({ input, output }) ->
 
     # request
-    output.request = await Request.make input.request
+    if input.request?
+      output.request = await Request.make input.request
 
     # status and description
     if input.status?

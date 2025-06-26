@@ -2,12 +2,28 @@ import assert from "@dashkite/assert"
 import {test, success} from "@dashkite/amen"
 import print from "@dashkite/amen-console"
 import Runner from "@dashkite/runner"
+import express from "express"
 
 import Request from "../src/request"
 import Response from "../src/response"
 
 import scenarios from "./scenarios"
+
+import api from "./api"
+
+# set up simple local server to return an API description
+server = ->
+  new Promise ( resolve, reject ) ->
+    try
+      express()
+        .get "/", ( _, response ) -> response.send api
+        .listen 3000, resolve
+    catch error
+      reject error
+
 do ->
+
+  await server()
 
   print await test "Sublime", 
 
@@ -26,5 +42,8 @@ do ->
           "Response":
             "*": ({ request, status, description, content }) ->
               Response.make { request, status, description, content }
+
+          "Sky Request":
+            "*": ({ input }) -> Request.make input
 
   process.exit if success then 0 else 1

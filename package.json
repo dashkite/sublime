@@ -58,13 +58,15 @@
     "@dashkite/genie-coffee": "link:../genie-coffee",
     "@dashkite/genie-module": "link:../genie-module",
     "@dashkite/genie-yaml": "link:../genie-yaml",
-    "@dashkite/runner": "link:../runner"
+    "@dashkite/runner": "link:../runner",
+    "express": "^5.1.0"
   },
   "dependencies": {
     "@dashkite/generic": "link:../generic",
     "@dashkite/http-headers": "link:../http-headers",
     "@dashkite/joy": "link:../joy",
     "@dashkite/media-type": "link:../media-type",
+    "@dashkite/scout": "link:../scout",
     "statuses": "^2.0.2"
   }
 }

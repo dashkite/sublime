@@ -18,8 +18,9 @@ class Headers extends metaclass()
 
     self = @make()
 
-    for name, value of headers
-      self.set name, value
+    if headers?
+      for name, value of headers
+        self.set name, value
 
     self
 
