@@ -181,6 +181,22 @@
           type: equal
           expect: '{"greeting":"hello"}'
 
+    - name: unsupported media type
+      request:
+        url: "https://foobar.com/hello?name=world" 
+        headers:
+          accept:
+            - type: application
+              subtype: json
+      content: hello
+      assertions:          
+        - path: $.status
+          type: equal
+          expect: 415
+        - path: $.description
+          type: equal
+          expect: unsupported media type
+
 - name: Sky Request
   scenarios:
     - name: simple request
@@ -194,6 +210,16 @@
         - path: $.url.toString()
           type: equal
           expect: "http://localhost:3000/hello/dan"
+
+    - name: method not allowed
+      input:
+        resource:
+          origin: "http://localhost:3000"
+          name: hello
+          bindings:
+            name: dan
+        method: put
+      rejects: "sublime: method not allowed"
 
 
 

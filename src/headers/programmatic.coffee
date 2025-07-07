@@ -17,7 +17,8 @@ class Headers extends metaclass()
 
   get: normalize ( name ) ->  
     serializer = Serializers.find name
-    serializer.parse @target.output.headers[ name ]
+    if @target.output.headers[ name ]
+      serializer.parse @target.output.headers[ name ]
 
   set: normalize ( name, value ) ->
     @target.update ( input ) ->
