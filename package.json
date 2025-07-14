@@ -66,7 +66,7 @@
     "@dashkite/generic": "link:../generic",
     "@dashkite/http-headers": "link:../http-headers",
     "@dashkite/joy": "link:../joy",
-    "@dashkite/media-type": "link:../media-type",
+    "@dashkite/media-type": "0.2.0",
     "@dashkite/scout": "link:../scout",
     "statuses": "^2.0.2"
   }
