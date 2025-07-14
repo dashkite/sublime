@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@dashkite/generic':
-        specifier: link:../generic
-        version: link:../generic
+        specifier: 0.3.0
+        version: 0.3.0
       '@dashkite/http-headers':
-        specifier: link:../http-headers
-        version: link:../http-headers
+        specifier: 0.6.0
+        version: 0.6.0
       '@dashkite/joy':
         specifier: 0.5.0
         version: 0.5.0
@@ -21,8 +21,8 @@ importers:
         specifier: 0.2.0
         version: 0.2.0
       '@dashkite/scout':
-        specifier: link:../scout
-        version: link:../scout
+        specifier: 0.2.0
+        version: 0.2.0
       statuses:
         specifier: ^2.0.2
         version: 2.0.2
@@ -616,6 +616,9 @@ packages:
   '@dashkite/assert@0.1.4':
     resolution: {integrity: sha512-OLOzI/lA+EwCh6znSexGAG1V4bkaT5gU04xl6ApEluv5jICnHhinZ707MObu+jhVVJ9uHDDlG85O+Afn1aTQoQ==}
 
+  '@dashkite/generic@0.3.0':
+    resolution: {integrity: sha512-A4eHFbIZwrrZmY0//KMiYKHaBUPxUA0PA2QhNZCWC+i11WtPSk6IDuPRkafbFYkmvpj80Gmr4Qznn3ASJIQP1A==}
+
   '@dashkite/genie-clean@0.2.0':
     resolution: {integrity: sha512-1L6Rzoiu7yRixhI6uPTCNSo3wHx/y2RgVlnUDAdO3I4TBCeU1h0Kiytr32ZCK7i3BCatObAdWJt0+9Nc3ZSUIw==}
 
@@ -633,6 +636,9 @@ packages:
     engines: {node: '>=20.0.0'}
     hasBin: true
 
+  '@dashkite/http-headers@0.6.0':
+    resolution: {integrity: sha512-zLIMwbuLAA0osdzsUDKv9uXy/v1+tm30mz4gfqSIdExVu4uOdyYYNSuSMDqfTloPqtQu/ex1L194LPoUrZ7bAw==}
+
   '@dashkite/joy@0.3.16':
     resolution: {integrity: sha512-dsU0us4j1Pb+zceoBvLbnZ2PbmULkJUtM2vtWLxKmoc1DE4w9SVTiPTe6JWvF0A0vk90ldv+Lc9qEA5x3O+DtQ==}
 
@@ -641,6 +647,9 @@ packages:
 
   '@dashkite/kaiko@0.3.3':
     resolution: {integrity: sha512-XnAvVr9y2MsDqMLr4A24vkLF7Iuq3E8RjHEEpqhe29P5NevVX9jXKcXUStNMp9MSJbjHd2pqUNiM5Vvdja9ggg==}
+
+  '@dashkite/lru-cache@0.1.0':
+    resolution: {integrity: sha512-bAN6/NxYrorgiKMdh0/f6U6AMdLoBFn9sJUZDD+Od/Fw6O1istAMF2hQugdO3SOeBOUi9dQN+rXMP60dJ/2zOw==}
 
   '@dashkite/masonry-coffee@0.2.0':
     resolution: {integrity: sha512-xJO48SIRpsYbJF32CwpA6yeEJhNh+DtxCucyt4MNJqO0yru9X7hoxZsHneRoUE+kISD0KTO8DLQiHv21nU/V2A==}
@@ -671,6 +680,15 @@ packages:
 
   '@dashkite/parse@0.4.3':
     resolution: {integrity: sha512-bE0kBjaGYjUnCzWJelQnx8vsfJ9YP07aRTVFZoY7TZWvMmnihoCSugL4IVWAOA2O0EAZXjT8FcjA4bNJ/BQwwg==}
+
+  '@dashkite/scan@0.2.0':
+    resolution: {integrity: sha512-Ihzyw90G+RAB7ietzrEZHDivqwsr4HdCm9LSUGKLFERN26RNvXmLp8CEE1OCkucH6ipfmDSF/ga8OVxxp0gGAw==}
+
+  '@dashkite/scout@0.2.0':
+    resolution: {integrity: sha512-7L1YLjr/alcq1lvPTll+7Sc0Ek4H5gBIyUWpuGuIWqRDvHECgBrOhUDfFizjIFRAGFRVItdlpLHz6BOFKGC0KQ==}
+
+  '@dashkite/url-codex@0.2.0':
+    resolution: {integrity: sha512-12m6YzdBEP3Rb0QGTMv1cTw4KLO37VW3HDHuUQV7QJQOGRzvS5+iQqXLkhfDJBqRC4oc1t9+iQ/6PEUtYXXArw==}
 
   '@dashkite/zephyr@0.2.0':
     resolution: {integrity: sha512-l3Fm9nyOIp1yBnv4IzGOKVgo1/UucU5WLvsqAfcP2jEVlE4AgpPkODssyloxTyC3N+bhcz1DXqC/7KokI1eVjA==}
@@ -2381,6 +2399,10 @@ snapshots:
     dependencies:
       '@dashkite/joy': 0.3.16
 
+  '@dashkite/generic@0.3.0':
+    dependencies:
+      '@dashkite/joy': 0.5.0
+
   '@dashkite/genie-clean@0.2.0':
     dependencies:
       '@dashkite/masonry': 0.13.0
@@ -2428,11 +2450,21 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
+  '@dashkite/http-headers@0.6.0':
+    dependencies:
+      '@dashkite/joy': 0.3.16
+      '@dashkite/media-type': 0.2.0
+      '@dashkite/parse': 0.4.3
+      '@dashkite/scan': 0.2.0
+      '@dashkite/url-codex': 0.2.0
+
   '@dashkite/joy@0.3.16': {}
 
   '@dashkite/joy@0.5.0': {}
 
   '@dashkite/kaiko@0.3.3': {}
+
+  '@dashkite/lru-cache@0.1.0': {}
 
   '@dashkite/masonry-coffee@0.2.0':
     dependencies:
@@ -2493,6 +2525,20 @@ snapshots:
   '@dashkite/parse@0.4.3':
     dependencies:
       '@dashkite/joy': 0.3.16
+
+  '@dashkite/scan@0.2.0':
+    dependencies:
+      '@dashkite/lru-cache': 0.1.0
+
+  '@dashkite/scout@0.2.0':
+    dependencies:
+      '@dashkite/joy': 0.3.16
+      '@dashkite/url-codex': 0.2.0
+
+  '@dashkite/url-codex@0.2.0':
+    dependencies:
+      '@dashkite/joy': 0.5.0
+      '@dashkite/parse': 0.4.3
 
   '@dashkite/zephyr@0.2.0':
     dependencies:

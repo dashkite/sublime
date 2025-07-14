@@ -63,11 +63,11 @@
     "express": "^5.1.0"
   },
   "dependencies": {
-    "@dashkite/generic": "link:../generic",
-    "@dashkite/http-headers": "link:../http-headers",
+    "@dashkite/generic": "0.3.0",
+    "@dashkite/http-headers": "0.6.0",
     "@dashkite/joy": "0.5.0",
     "@dashkite/media-type": "0.2.0",
-    "@dashkite/scout": "link:../scout",
+    "@dashkite/scout": "0.2.0",
     "statuses": "^2.0.2"
   }
 }
