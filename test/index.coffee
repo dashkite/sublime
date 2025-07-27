@@ -36,14 +36,21 @@ do ->
         .apply
 
           "Request":
-            "*": ({ url, method, content, headers }) -> 
-              Request.make { url, method, content, headers }
+            "*": ({ input }) -> 
+              Request
+                .make input
+                .get()
 
           "Response":
-            "*": ({ request, status, description, content }) ->
-              Response.make { request, status, description, content }
+            "*": ({ input }) ->
+              Response
+                .make input
+                .get()
 
           "Sky Request":
-            "*": ({ input }) -> Request.make input
+            "*": ({ input }) ->
+              Request
+                .make input
+                .get()
 
   process.exit if success then 0 else 1

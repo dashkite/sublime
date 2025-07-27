@@ -2,7 +2,8 @@
   scenarios:
 
     - name: simple
-      url: "https://foobar.com/hello?name=world"
+      input:
+        url: "https://foobar.com/hello?name=world"
 
       assertions:
 
@@ -32,8 +33,9 @@
             name: world
 
     - name: with method
-      url: "https://foobar.com/hello?name=world"
-      method: "POST"
+      input:
+        url: "https://foobar.com/hello?name=world"
+        method: "POST"
 
       assertions:
 
@@ -50,14 +52,14 @@
           expect: post
 
     - name: with headers
-      url: "https://foobar.com/hello?name=world"
-      method: POST
-      content: hello
-      headers:
-        Content-Type:
-          type: text
-          subtype: plain
-
+      input:
+        url: "https://foobar.com/hello?name=world"
+        method: POST
+        content: hello
+        headers:
+          Content-Type:
+            type: text
+            subtype: plain
 
       assertions:
 
@@ -75,9 +77,10 @@
   scenarios:
 
     - name: status as text
-      request:
-        url: "https://foobar.com/hello?name=world"            
-      status: "200"
+      input:
+        request:
+          url: "https://foobar.com/hello?name=world"            
+        status: "200"
       assertions:          
         - path: $.status
           type: equal
@@ -87,36 +90,40 @@
           expect: ok
 
     - name: status as number
-      request:
-        url: "https://foobar.com/hello?name=world"            
-      status: 200
+      input:
+        request:
+          url: "https://foobar.com/hello?name=world"            
+        status: 200
       assertions:          
         - path: $.status
           type: equal
           expect: 200
 
     - name: description only
-      request:
-        url: "https://foobar.com/hello?name=world"            
-      description: ok
+      input:
+        request:
+          url: "https://foobar.com/hello?name=world"            
+        description: ok
       assertions:          
         - path: $.status
           type: equal
           expect: 200
 
     - name: content only
-      request:
-        url: "https://foobar.com/hello?name=world"            
-      content: hello
+      input:
+        request:
+          url: "https://foobar.com/hello?name=world"            
+        content: hello
       assertions:          
         - path: $.status
           type: equal
           expect: 200
 
     - name: not found
-      request:
-        url: "https://foobar.com/hello?name=world"            
-      description: "not found"
+      input:
+        request:
+          url: "https://foobar.com/hello?name=world"            
+        description: "not found"
       assertions:          
         - path: $.status
           type: equal
@@ -126,8 +133,9 @@
           expect: not found
 
     - name: no content
-      request:
-        url: "https://foobar.com/hello?name=world"            
+      input:
+        request:
+          url: "https://foobar.com/hello?name=world"            
       assertions:          
         - path: $.status
           type: equal
@@ -137,13 +145,14 @@
           expect: no content
 
     - name: content as text
-      request:
-        url: "https://foobar.com/hello?name=world" 
-        headers:
-          accept:
-            - type: text
-              subtype: plain
-      content: hello   
+      input:
+        request:
+          url: "https://foobar.com/hello?name=world" 
+          headers:
+            accept:
+              - type: text
+                subtype: plain
+        content: hello   
       assertions:          
         - path: $.status
           type: equal
@@ -159,14 +168,15 @@
           expect: hello
 
     - name: content as object
-      request:
-        url: "https://foobar.com/hello?name=world" 
-        headers:
-          accept:
-            - type: application
-              subtype: json
-      content:
-        greeting: hello   
+      input:
+        request:
+          url: "https://foobar.com/hello?name=world" 
+          headers:
+            accept:
+              - type: application
+                subtype: json
+        content:
+          greeting: hello   
       assertions:          
         - path: $.status
           type: equal
@@ -182,13 +192,14 @@
           expect: '{"greeting":"hello"}'
 
     - name: unsupported media type
-      request:
-        url: "https://foobar.com/hello?name=world" 
-        headers:
-          accept:
-            - type: application
-              subtype: json
-      content: hello
+      input:
+        request:
+          url: "https://foobar.com/hello?name=world" 
+          headers:
+            accept:
+              - type: application
+                subtype: json
+        content: hello
       assertions:          
         - path: $.status
           type: equal
