@@ -7,6 +7,8 @@ import express from "express"
 import Request from "../src/request"
 import Response from "../src/response"
 
+import * as Sky from "../src/sky"
+
 import scenarios from "./scenarios"
 
 import api from "./api"
@@ -49,7 +51,7 @@ do ->
 
           "Sky Request":
             "*": ({ input }) ->
-              Request
+              Sky.Request
                 .make input
                 .get()
 
