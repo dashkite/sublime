@@ -59,8 +59,7 @@
     "@dashkite/genie-coffee": "0.13.1",
     "@dashkite/genie-release": "^0.3.0",
     "@dashkite/genie-yaml": "0.11.1",
-    "@dashkite/runner": "link:../runner",
-    "express": "^5.1.0"
+    "@dashkite/runner": "link:../runner"
   },
   "dependencies": {
     "@dashkite/generic": "0.9.1",
@@ -68,7 +67,6 @@
     "@dashkite/joy": "0.12.1",
     "@dashkite/media-type": "0.8.1",
     "@dashkite/reactive": "link:../reactive",
-    "@dashkite/scout": "0.8.1",
     "statuses": "^2.0.2"
   }
 }
