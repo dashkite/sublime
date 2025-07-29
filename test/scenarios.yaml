@@ -207,3 +207,46 @@
         - path: $.description
           type: equal
           expect: unsupported media type
+
+- name: convert
+
+  scenarios:
+
+    - name: request
+
+      scenarios:
+
+        - name: basic
+
+          input:
+            url: "https://foobar.com/hello?name=world"
+
+          assertions:
+
+            - path: $.url.toString()
+              type: equal
+              expect: "https://foobar.com/hello?name=world"
+
+
+    - name: response
+
+      scenarios:
+
+        - name: basic
+
+          input:
+            body: "hello"
+            options:
+              status: 200
+              headers:
+                "content-type": "text/plain"
+
+          assertions:
+
+            - path: $.status
+              type: equal
+              expect: 200
+
+            - path: $.description
+              type: equal
+              expect: ok

@@ -8,6 +8,8 @@ class Value extends metaclass()
 
   @getters
 
+    data: -> @output
+
     url: -> new URL @output.url
 
     domain: -> @url.hostname
