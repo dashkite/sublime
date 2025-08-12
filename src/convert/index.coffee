@@ -5,7 +5,8 @@ import * as $Response from "../response"
 
 convert = Generic.make "convert"
 
-convert.define [ Object, Type.isAny ], ({ to }, value ) -> convert to, value
+convert.define [ Object, Type.isAny ], 
+  ({ to }, value ) -> convert to, value
 
 convert.define [ "fetch", $Request.Value ], (  _, request ) ->
   { url, method, headers, content } = request

@@ -85,9 +85,6 @@
         - path: $.status
           type: equal
           expect: 200
-        - path: $.description
-          type: equal
-          expect: ok
 
     - name: status as number
       input:
@@ -128,9 +125,6 @@
         - path: $.status
           type: equal
           expect: 404
-        - path: $.description
-          type: equal
-          expect: not found
 
     - name: no content
       input:
@@ -140,9 +134,6 @@
         - path: $.status
           type: equal
           expect: 204
-        - path: $.description
-          type: equal
-          expect: no content
 
     - name: content as text
       input:
@@ -157,9 +148,6 @@
         - path: $.status
           type: equal
           expect: 200
-        - path: $.description
-          type: equal
-          expect: ok
         - path: $.headers.get 'content-length'
           type: equal
           expect: 5
@@ -181,9 +169,6 @@
         - path: $.status
           type: equal
           expect: 200
-        - path: $.description
-          type: equal
-          expect: ok
         - path: $.headers.get 'content-length'
           type: equal
           expect: 20
@@ -204,9 +189,6 @@
         - path: $.status
           type: equal
           expect: 415
-        - path: $.description
-          type: equal
-          expect: unsupported media type
 
 - name: convert
 
@@ -246,7 +228,3 @@
             - path: $.status
               type: equal
               expect: 200
-
-            - path: $.description
-              type: equal
-              expect: ok

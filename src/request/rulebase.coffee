@@ -12,6 +12,10 @@ rulebase = ->
       @output.url = @input.url
     else if Type.isKind URL, @input.url
       @output.url = @input.url.toString()
+  else if @input.origin?    
+    url = new URL ( @input.target ? "/" ), @input.origin
+    url.search = new URLSearchParams @input.query
+    @output.url = url.href
 
   # method
   if !@input.method?

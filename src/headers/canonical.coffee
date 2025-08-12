@@ -41,6 +41,6 @@ class Headers extends metaclass()
       .define [ String, String ], ( name, value ) ->
         serializer = Serializers.find name
         # this validates the value
-        @set name, serializer.parse value    
+        @data[ name ] = serializer.format serializer.parse value    
 
 export default Headers
