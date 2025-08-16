@@ -15,6 +15,9 @@ class Headers extends metaclass()
   @make: ( target ) ->
     Object.assign ( new @ ), { target }
 
+  @getters
+    data: -> @target.output.headers
+
   get: normalize ( name ) ->
     serializer = Serializers.find name
     if @target.output.headers[ name ]

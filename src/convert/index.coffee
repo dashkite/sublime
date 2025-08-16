@@ -16,6 +16,13 @@ convert.define [ "fetch", $Request.Value ], (  _, request ) ->
     redirect: "follow", priority: "auto" 
   }
 
+convert.define [ "fetch", $Response.Value ], (  _, response ) ->
+  # TODO ensure that response.data returns canonical attributes
+  { status, headers, content } = response.data
+  # binary content should be ArrayBuffer
+  # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
+  new Response content, { status, headers }
+
 convert.define [ "sublime", Response ], ( _, response ) ->
   $Response.Builder
     .make

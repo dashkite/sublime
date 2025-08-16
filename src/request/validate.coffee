@@ -1,9 +1,23 @@
-validate = ->
+import EventReactor from "@dashkite/reactive/event-reactor"
 
-  if @input.url? && !@output.url?
-    throw new Error "sublime: unsupported url value"
+validate = ( reactor ) ->
 
-  # throws unless the URL is valid
-  ( new URL @output.url )
+  EventReactor
+
+    .make reactor
+    .bind @
+
+    .when "validate", ->
+
+      if @input.url? && !@output.url?
+        throw new Error "sublime: unsupported url value"
+
+      # throws unless the URL is valid
+      ( new URL @output.url )
+
+      # TODO check for inconsistencies between content
+      # headers and content
+
+    .run()
 
 export default validate

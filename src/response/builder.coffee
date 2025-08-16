@@ -3,6 +3,7 @@ import { metaclass } from "@dashkite/joy/metaclass"
 import { Queue } from "@dashkite/joy/iterable"
 
 import rulebase from "./rulebase"
+import driver from "./driver"
 import validate from "./validate"
 import Value from "./value"
 
@@ -23,7 +24,7 @@ class Builder extends metaclass()
     super()
     @updates = Queue.make()
     @promises = []
-    @rules = Fn.pipe [ @constructor.rules..., validate ]
+    @rules = Fn.pipe [ driver, @constructor.rules..., validate ]
     @start()
 
   start: ->
