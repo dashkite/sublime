@@ -28,9 +28,9 @@
       "browser": "./build/browser/src/headers/*.js",
       "node": "./build/node/src/headers/*.js"
     },
-    "#content/*": {
-      "browser": "./build/browser/src/content/*.js",
-      "node": "./build/node/src/content/*.js"
+    "#builder": {
+      "browser": "./build/browser/src/builder/index.js",
+      "node": "./build/node/src/builder/index.js"
     },
     "#request": {
       "browser": "./build/browser/src/request/index.js",
