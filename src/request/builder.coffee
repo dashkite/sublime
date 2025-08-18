@@ -2,7 +2,6 @@ import builder from "#builder"
 
 import Value from "./value"
 import rulebase from "./rulebase"
-import driver from "./driver"
 import validate from "./validate"
 
 class Builder extends builder()
@@ -11,6 +10,6 @@ class Builder extends builder()
   
   @validator validate
   
-  @rulebase [ driver, rulebase ]
+  @rulebase [ rulebase ]
 
 export default Builder

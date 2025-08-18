@@ -1,80 +1,98 @@
 import * as Type from "@dashkite/joy/type"
+import * as Time from "@dashkite/joy/time"
 import { MediaType } from "@dashkite/media-type"
-import EventReactor from "@dashkite/reactive/event-reactor"
+import Rulebase from "@dashkite/athena"
+
 import Headers from "#headers/canonical"
 
-rulebase = ( reactor ) ->
+rulebase = Rulebase.make
 
-  yield from EventReactor
+  clone: ({ input, output, state... }) ->
+    {
+      input: structuredClone input
+      output: structuredClone output
+      state...
+    }
 
-    .make reactor
-    .bind @
+rulebase.conditions
 
-    .forward "finalize, validate"
+  "has a url": -> @input.url?
 
-    .when "url", ( event ) ->
+  "url is text": -> Type.isString @input.url
 
-      if @input.url?
-        if Type.isString @input.url
-          @output.url = @input.url
-        else if Type.isKind URL, @input.url
-          @output.url = @input.url.toString()
-      else if @input.origin?    
-        url = new URL ( @input.target ? "/" ), @input.origin
-        url.search = new URLSearchParams @input.query
-        @output.url = url.href
-      else yield event
+  "url is of type url": -> Type.isKind URL, @input.url
 
-    .when "method", ( event ) ->
+  "has an origin": -> @input.origin?
 
-      if @input.method?
-        @output.method = @input.method.toLowerCase()
-      else
-        if !@input.content?
-          # default but yield in case another rulebase has
-          # a better idea of what to do
-          @output.method = "get"
-          yield event 
-        else
-          yield event
+  "has a method": -> @input.method?
 
-    .when "headers", ( event ) ->
+  "has headers": -> @input.headers?
 
-      if @input.headers?
-        @output.headers = ( Headers.from @input.headers ).data
-      else
-        @output.headers = Headers.make().data
+  "has content": -> @input.content?
 
-    .when "content", ( event ) ->
+  "has content-type": -> @output.headers?[ "content-type" ]
 
-      if @input.content?
+  "content is unserialized": -> @input.serialized != true
 
-        # serialize the content based on content-type
-        # otherwise infer the content-type
+  "headers ready": -> @output.headers?
 
-        if ( type = @output.headers[ "content-type" ])?
-          @output.content = MediaType.serialize type, @input.content
-        else
-          @output.content = MediaType.serialize @input.content
-          type = MediaType.fromValue @input.content
-          @output.headers[ "content-type" ] = MediaType.format type
+rulebase.actions
+  
+  "set the url": -> @output.url = @input.url
+  
+  "convert url to text": ->  @output.url = @input.url.toString()
+  
+  "construct url from constituents": ->
+    url = new URL ( @input.target ? "/" ), @input.origin
+    url.search = new URLSearchParams @input.query
+    @output.url = url.href
+  
+  "set the method": -> @output.method = @input.method.toLowerCase()
+  
+  "set a default method": -> @output.method = "get"
+  
+  "set headers": -> @output.headers = ( Headers.from @input.headers ).data
+  
+  "set empty headers": -> @output.headers = Headers.make().data
+  
+  "serialize content": -> 
+    @output.content = MediaType.serialize type, @input.content
+  
+  "infer content-type": ->
+    type = MediaType.fromValue @input.content
+    @output.headers[ "content-type" ] = MediaType.format type
+  
+  "remove content headers": ->
+    for key, value of @output.headers
+      if key.startsWith "content-"
+          delete @output.headers[ key ]
+  
+rulebase.rules
+  
+  "set the url": [ "has a url", "url is text" ]
+  
+  "convert url to text": [ "has a url", "url is of type url" ]
+  
+  "construct url from constituents": [ "has an origin" ]
+  
+  "set the method": [ "has a method" ]
+  
+  "set a default method": [ "!has a method", "!has content" ]
+  
+  "set headers": [ "has headers" ]
+  
+  "set empty headers": [ "!has headers"]
+  
+  "infer content-type": [
+    "headers ready"
+    "has content"
+    "!has content-type" 
+  ]
+  
+  "remove content headers": [ "headers ready", "!has content" ]
 
-        # if we were able to serialize the content, 
-        # set the content-length header
+run = ->
+  Object.assign @, await rulebase.apply @
+  yield name: "validate"
 
-        # TODO can we set the content length more reliably?
-
-        if @output.content?
-          @output.headers[ "content-length" ] = @output.content.length
-
-      else
-
-        # delete content headers because there's no content
-        for key, value of @output.headers
-          if key.startsWith "content-"
-            delete @output.headers[ key ]
-
-  await return
-
-
-export default rulebase
+export default run

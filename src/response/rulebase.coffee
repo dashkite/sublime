@@ -1,87 +1,162 @@
 import { MediaType, Accept } from "@dashkite/media-type"
-import EventReactor from "@dashkite/reactive/event-reactor"
+import Rulebase from "@dashkite/athena"
+
 import Request from "#request"
 import Headers from "#headers/canonical"
+
 import Status from "./status"
 
-rulebase = ( reactor ) ->
+rulebase = Rulebase.make
 
-  yield from EventReactor
+  clone: ({ input, output, state... }) ->
+    {
+      input: structuredClone input
+      output: structuredClone output
+      state...
+    }
 
-    .make reactor
-    .bind @
+rulebase.conditions
 
-    .forward "finalize, validate"
+  "has request": -> @input.request?
 
-    .when "request", ( event ) ->
+  "has status": -> @input.status?
+  
+  "has description": -> @input.description?
 
-      if @input.request?
-        @output.request = await Request
-          .make @input.request
-          .get()
-      else
-        yield event
+  "has headers": -> @input.headers?
 
-    .when "status", ( event ) ->
+  "has content": -> @input.content?
 
-      if @input.status?
-        @output.status = Status.from @input.status
-      else if @input.description?
-        @output.status = Status.from @input.description
-      else if @input.content?
-        @output.status = 200
-      else
-        @output.status = 204
+  "content ready": -> @output.content?
 
-    .when "headers", ( event ) ->
+  "headers ready": -> @output.headers?
 
-      @output.headers = ( Headers.from @input.headers ).data
+  # we lose the request type when cloning, so the headers
+  # getter is not there
+  "has accept": -> ( @output.request?.output.headers[ "accept" ])?
 
-    .when "content", ( event ) ->
+  "has content type": -> @output.headers?[ "content-type" ]?
 
-      try
+  # we lose the request type when cloning, so the headers
+  # getter is not there
+  "is acceptable": ->
+    accept = Accept.parse @output.request?.output.headers[ "accept" ]
+    ( Accept.selectByContent @input.content, accept )?
 
-        if @input.content?
+rulebase.actions
 
-          if ( accept = @output.request?.headers.get "accept" )?
+  "set request": ->
+    @output.request ?= await Request
+      .make @input.request
+      .get()
 
-            if ( type = @output.headers[ "content-type" ])?
+  "set status": -> @output.status = Status.from @input.status
 
-              if ( selected = Accept.select accept, type )?
-                @output.headers[ "content-type" ] = MediaType.format selected
-                @output.content = MediaType.serialize selected, @input.content
-              else
-                @output.status = 415
+  "set status from description": ->
+    @output.status = Status.from @input.description
 
-            else if ( selected = Accept.selectByContent @input.content, accept )?
-              @output.headers[ "content-type" ] = MediaType.format selected
-              @output.content = MediaType.serialize selected, @input.content
-            else
-              @output.status = 415
-              @output.description = "unsupported media type"
+  "infer status ok": -> @output.status = 200
 
-          else if ( type = @output.headers[ "content-type" ])?
-            @output.content = MediaType.serialize type, @input.content
-          else
-            @output.content = MediaType.serialize @input.content
-            type = MediaType.fromValue @input.content
-            @output.headers[ "content-type" ] = MediaType.format type
+  "infer status no content": -> @output.status = 204
 
-          if @output.content?
-            @output.headers[ "content-length" ] = @output.content.length
+  "set headers": -> @output.headers ?= ( Headers.from @input.headers ).data
+  
+  "set empty headers": -> @output.headers ?= Headers.make().data
+  
+  # we lose the request type when cloning, so the headers
+  # getter is not there
+  "infer content type from accept": ->
+    accept = Accept.parse @output.request.output.headers[ "accept" ]
+    if ( selected = Accept.selectByContent @input.content, accept )?
+      @output.headers[ "content-type" ] = MediaType.format selected
 
-        else
+  "infer content type from content": ->
+    type = MediaType.fromValue @input.content
+    @output.headers[ "content-type" ] = MediaType.format type
 
-          # delete content headers because there's no content
-          for key, value of @output.headers
-            if key.startsWith "content-"
-              delete @output.headers[ key ]
+  "unsupported media type": -> 
+    @output.status = 415
+    delete @output.content
 
-      catch error
-        console.warn "sublime: error processing content"
-        console.warn error
-        yield event
+  "serialize content": ->
+    type = @output.headers[ "content-type" ]
+    @output.content = MediaType.serialize type, @input.content
 
-  await return
+  "set content length": ->
+    @output.headers[ "content-length" ] = @output.content.length
 
-export default rulebase
+  "remove content headers": ->
+    for key, value of @output.headers
+      if key.startsWith "content-"
+        delete @output.headers[ key ]
+
+rulebase.rules
+
+
+  "set request": [ "has request" ]
+
+  "set status": [ "has status" ]
+
+  "set status from description": [ "!has status", "has description" ]
+
+  "infer status ok": [
+    "!has status"
+    "!has description"
+    "has content" 
+  ]
+
+  "infer status no content": [
+    "!has status"
+    "!has description"
+    "!has content" 
+  ]
+
+  "set headers": [ "has headers" ]
+  
+  "set empty headers": [ "!has headers"]
+
+  "infer content type from accept": [ 
+    "has content"
+    "headers ready"
+    "!has content type" 
+    "has accept"
+  ]
+
+  "infer content type from content": [
+    "has content"
+    "headers ready"
+    "!has content type" 
+    "!has accept"
+  ]
+
+  "unsupported media type": [
+    "headers ready"
+    "has content"
+    "has accept"
+    "!is acceptable"
+  ]
+
+  "serialize content": [
+    "has content"
+    "headers ready"
+    "has content type"
+  ]
+
+  "set content length": [
+    "headers ready"
+    "content ready"
+  ]
+
+  "remove content headers": [
+    "headers ready"
+    "!has content"
+  ]
+
+run = ->
+  { input, output } = @
+  { intput, output } = await rulebase.apply { input, output }
+  # console.log { input, output }
+  Object.assign @, { input, output }
+  yield name: "validate"
+
+export default run
