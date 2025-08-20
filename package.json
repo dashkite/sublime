@@ -21,6 +21,10 @@
     ".": {
       "browser": "./build/browser/src/index.js",
       "node": "./build/node/src/index.js"
+    },
+    "./state/*": {
+      "browser": "./build/browser/src/state/*.js",
+      "node": "./build/node/src/state/*.js"
     }
   },
   "imports": {
@@ -39,6 +43,10 @@
     "#response": {
       "browser": "./build/browser/src/response/index.js",
       "node": "./build/node/src/response/index.js"
+    },
+    "#state/*": {
+      "browser": "./build/browser/src/state/*.js",
+      "node": "./build/node/src/state/*.js"
     }
   },
   "files": [
@@ -66,7 +74,7 @@
     "@dashkite/athena": "link:../athena",
     "@dashkite/generic": "0.9.1",
     "@dashkite/http-headers": "0.12.2",
-    "@dashkite/joy": "0.12.1",
+    "@dashkite/joy": "link:../joy",
     "@dashkite/media-type": "0.8.1",
     "@dashkite/reactive": "link:../reactive",
     "statuses": "^2.0.2"

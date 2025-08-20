@@ -8,12 +8,7 @@ import Status from "./status"
 
 rulebase = Rulebase.make
 
-  clone: ({ input, output, state... }) ->
-    {
-      input: structuredClone input
-      output: structuredClone output
-      state...
-    }
+  clone: ( state ) -> state.clone()
 
 rulebase.conditions
 
@@ -31,16 +26,12 @@ rulebase.conditions
 
   "headers ready": -> @output.headers?
 
-  # we lose the request type when cloning, so the headers
-  # getter is not there
-  "has accept": -> ( @output.request?.output.headers[ "accept" ])?
+  "has accept": -> ( @output.request?.headers.get "accept" )?
 
   "has content type": -> @output.headers?[ "content-type" ]?
 
-  # we lose the request type when cloning, so the headers
-  # getter is not there
   "is acceptable": ->
-    accept = Accept.parse @output.request?.output.headers[ "accept" ]
+    accept = @output.request.headers.get "accept"
     ( Accept.selectByContent @input.content, accept )?
 
 rulebase.actions
@@ -63,10 +54,8 @@ rulebase.actions
   
   "set empty headers": -> @output.headers ?= Headers.make().data
   
-  # we lose the request type when cloning, so the headers
-  # getter is not there
   "infer content type from accept": ->
-    accept = Accept.parse @output.request.output.headers[ "accept" ]
+    accept = @output.request.headers.get "accept"
     if ( selected = Accept.selectByContent @input.content, accept )?
       @output.headers[ "content-type" ] = MediaType.format selected
 
@@ -92,7 +81,6 @@ rulebase.actions
 
 rulebase.rules
 
-
   "set request": [ "has request" ]
 
   "set status": [ "has status" ]
@@ -113,7 +101,7 @@ rulebase.rules
 
   "set headers": [ "has headers" ]
   
-  "set empty headers": [ "!has headers"]
+  "set empty headers": [ "!has headers" ]
 
   "infer content type from accept": [ 
     "has content"
@@ -152,11 +140,4 @@ rulebase.rules
     "!has content"
   ]
 
-run = ->
-  { input, output } = @
-  { intput, output } = await rulebase.apply { input, output }
-  # console.log { input, output }
-  Object.assign @, { input, output }
-  yield name: "validate"
-
-export default run
+export default rulebase

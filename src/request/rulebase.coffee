@@ -7,12 +7,7 @@ import Headers from "#headers/canonical"
 
 rulebase = Rulebase.make
 
-  clone: ({ input, output, state... }) ->
-    {
-      input: structuredClone input
-      output: structuredClone output
-      state...
-    }
+  clone: ( state ) -> state.clone()
 
 rulebase.conditions
 
@@ -21,6 +16,15 @@ rulebase.conditions
   "url is text": -> Type.isString @input.url
 
   "url is of type url": -> Type.isKind URL, @input.url
+
+  "url ready": -> @output.url?
+
+  "valid url": -> 
+    try
+      ( new URL @output.url )
+      true
+    catch
+      false
 
   "has an origin": -> @input.origin?
 
@@ -66,7 +70,16 @@ rulebase.actions
     for key, value of @output.headers
       if key.startsWith "content-"
           delete @output.headers[ key ]
+
+  "throw unsupported url value": ->
+    @throw new Error "sublime: unsupported url value"
+
+  "throw missing url value": ->
+    @throw new Error "sublime: missing url value"
   
+  "throw invalid url": ->
+    @throw new Error "sublime: invalid url"
+
 rulebase.rules
   
   "set the url": [ "has a url", "url is text" ]
@@ -81,7 +94,7 @@ rulebase.rules
   
   "set headers": [ "has headers" ]
   
-  "set empty headers": [ "!has headers"]
+  "set empty headers": [ "!has headers" ]
   
   "infer content-type": [
     "headers ready"
@@ -91,8 +104,14 @@ rulebase.rules
   
   "remove content headers": [ "headers ready", "!has content" ]
 
-run = ->
-  Object.assign @, await rulebase.apply @
-  yield name: "validate"
+  "throw unsupported url value": [
+    "has a url"
+    "!url is text"
+    "!url is of type url" 
+  ]
 
-export default run
+  "throw missing url value": [ "!has a url", "!url ready" ]
+
+  "throw invalid url": [ "url ready", "!valid url" ]
+
+export default rulebase

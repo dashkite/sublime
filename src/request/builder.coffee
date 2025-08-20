@@ -1,15 +1,13 @@
 import builder from "#builder"
+import State from "#state/request"
 
 import Value from "./value"
 import rulebase from "./rulebase"
-import validate from "./validate"
 
-class Builder extends builder()
+class Builder extends builder Value
   
-  @produces Value
-  
-  @validator validate
-  
-  @rulebase [ rulebase ]
+  @rulebase rulebase
+
+  @state State
 
 export default Builder
