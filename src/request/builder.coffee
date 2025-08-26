@@ -1,13 +1,11 @@
 import builder from "#builder"
-import State from "#state/request"
+import content from "#content/rulebase"
 
 import Value from "./value"
 import rulebase from "./rulebase"
 
 class Builder extends builder Value
   
-  @rulebase rulebase
-
-  @state State
+  @rulebases [ rulebase, content ]
 
 export default Builder

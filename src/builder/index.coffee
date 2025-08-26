@@ -6,7 +6,8 @@ import Generic from "@dashkite/generic"
 
 start = ( reactor ) ->
   done = false
-  { value, done } = await reactor.next() while !done
+  while !done
+    { value, done } = await reactor.next()
   value
 
 builder = ( T ) ->
@@ -19,7 +20,9 @@ builder = ( T ) ->
       @_rulebases.push rulebase 
       @
 
-    @state: ( @State ) ->
+    @rulebases: ( rulebases ) ->
+      @_rulebases.push rulebases...
+      @
 
     @make: ( input = {}) ->
       self = new @
@@ -28,7 +31,7 @@ builder = ( T ) ->
 
     @getters
       rules: -> Fn.pipe @constructor._rulebases
-      state: -> @constructor.State.make { @input, @output, @errors }
+      state: -> { @input, @output, @errors }
 
     constructor: ->
       super()

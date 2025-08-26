@@ -5,7 +5,11 @@ import Rulebase from "@dashkite/athena"
 
 import Headers from "#headers/canonical"
 
+import State from "#state"
+
 rulebase = Rulebase.make
+
+  initialize: ( state ) -> State.make state
 
   clone: ( state ) -> state.clone()
 
@@ -34,9 +38,7 @@ rulebase.conditions
 
   "has content": -> @input.content?
 
-  "has content-type": -> @output.headers?[ "content-type" ]
-
-  "content is unserialized": -> @input.serialized != true
+  "has content-type": -> @output.headers?.get "content-type"
 
   "headers ready": -> @output.headers?
 
@@ -55,22 +57,13 @@ rulebase.actions
   
   "set a default method": -> @output.method = "get"
   
-  "set headers": -> @output.headers = ( Headers.from @input.headers ).data
+  "set headers": -> @output.headers = ( Headers.from @input.headers )
   
-  "set empty headers": -> @output.headers = Headers.make().data
+  "set empty headers": -> @output.headers = Headers.make()
   
   "serialize content": -> 
     @output.content = MediaType.serialize type, @input.content
   
-  "infer content-type": ->
-    type = MediaType.fromValue @input.content
-    @output.headers[ "content-type" ] = MediaType.format type
-  
-  "remove content headers": ->
-    for key, value of @output.headers
-      if key.startsWith "content-"
-          delete @output.headers[ key ]
-
   "throw unsupported url value": ->
     @throw new Error "sublime: unsupported url value"
 
@@ -96,14 +89,6 @@ rulebase.rules
   
   "set empty headers": [ "!has headers" ]
   
-  "infer content-type": [
-    "headers ready"
-    "has content"
-    "!has content-type" 
-  ]
-  
-  "remove content headers": [ "headers ready", "!has content" ]
-
   "throw unsupported url value": [
     "has a url"
     "!url is text"

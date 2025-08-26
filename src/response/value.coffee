@@ -1,4 +1,5 @@
 import { metaclass } from "@dashkite/joy/metaclass"
+import { MediaType } from "@dashkite/media-type"
 import Headers from "#headers/programmatic"
 
 class Value extends metaclass()
@@ -28,7 +29,12 @@ class Value extends metaclass()
 
     description: -> @output.description
 
-    content: -> @output.content
+    content: -> 
+      switch MediaType.category @headers.get "content-type"
+        when "json"
+          JSON.parse @output.content
+        else
+          @output.content
 
 export default Value
 

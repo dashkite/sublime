@@ -63,7 +63,7 @@
 
       assertions:
 
-        - path: $.headers.get 'content-type'
+        - path: ( $.headers.get 'content-type' ).data
           type: deepEqual
           expect:
             type: text
@@ -144,6 +144,8 @@
               - type: text
                 subtype: plain
         content: hello   
+        headers:
+          content-type: text/plain
       assertions:          
         - path: $.status
           type: equal

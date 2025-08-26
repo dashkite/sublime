@@ -1,5 +1,6 @@
 import * as Fn from "@dashkite/joy/function"
 import * as Type from "@dashkite/joy/type"
+import * as Val from "@dashkite/joy/value"
 import { metaclass } from "@dashkite/joy/metaclass"
 import Generic from "@dashkite/generic"
 
@@ -28,6 +29,10 @@ class Headers extends metaclass()
     super()
     @data = {}
 
+  equal: ( value ) ->
+    ( Type.isKind Headers, value ) &&
+      Val.equal @data, value.data
+
   get: normalize ( name ) -> @data[ name ]
 
   set: normalize do ->
@@ -42,5 +47,9 @@ class Headers extends metaclass()
         serializer = Serializers.find name
         # this validates the value
         @data[ name ] = serializer.format serializer.parse value    
+
+  remove: normalize ( name ) -> delete @data[ name ]
+
+  [ Symbol.iterator ]: -> yield from Object.entries @data
 
 export default Headers

@@ -22,31 +22,59 @@
       "browser": "./build/browser/src/index.js",
       "node": "./build/node/src/index.js"
     },
-    "./state/*": {
-      "browser": "./build/browser/src/state/*.js",
-      "node": "./build/node/src/state/*.js"
+    "./request": {
+      "browser": "./build/browser/src/request/index.js",
+      "node": "./build/node/src/request/index.js"
+    },
+    "./request/*": {
+      "browser": "./build/browser/src/request/*.js",
+      "node": "./build/node/src/request/*.js"
+    },
+    "./response": {
+      "browser": "./build/browser/src/response/index.js",
+      "node": "./build/node/src/response/index.js"
+    },
+    "./response/*": {
+      "browser": "./build/browser/src/response/*.js",
+      "node": "./build/node/src/response/*.js"
     }
   },
   "imports": {
+    "#helpers/*": {
+      "browser": "./build/browser/src/helpers/*.js",
+      "node": "./build/node/src/helpers/*.js"
+    },
     "#headers/*": {
       "browser": "./build/browser/src/headers/*.js",
       "node": "./build/node/src/headers/*.js"
+    },
+    "#content/*": {
+      "browser": "./build/browser/src/content/*.js",
+      "node": "./build/node/src/content/*.js"
     },
     "#builder": {
       "browser": "./build/browser/src/builder/index.js",
       "node": "./build/node/src/builder/index.js"
     },
+    "#state": {
+      "browser": "./build/browser/src/state/index.js",
+      "node": "./build/node/src/state/index.js"
+    },
     "#request": {
       "browser": "./build/browser/src/request/index.js",
       "node": "./build/node/src/request/index.js"
+    },
+    "#request/*": {
+      "browser": "./build/browser/src/request/*.js",
+      "node": "./build/node/src/request/*.js"
     },
     "#response": {
       "browser": "./build/browser/src/response/index.js",
       "node": "./build/node/src/response/index.js"
     },
-    "#state/*": {
-      "browser": "./build/browser/src/state/*.js",
-      "node": "./build/node/src/state/*.js"
+    "#response/*": {
+      "browser": "./build/browser/src/response/*.js",
+      "node": "./build/node/src/response/*.js"
     }
   },
   "files": [
@@ -73,9 +101,9 @@
   "dependencies": {
     "@dashkite/athena": "link:../athena",
     "@dashkite/generic": "0.9.1",
-    "@dashkite/http-headers": "0.12.2",
+    "@dashkite/http-headers": "link:../http-headers",
     "@dashkite/joy": "link:../joy",
-    "@dashkite/media-type": "0.8.1",
+    "@dashkite/media-type": "link:../media-type",
     "@dashkite/reactive": "link:../reactive",
     "statuses": "^2.0.2"
   }

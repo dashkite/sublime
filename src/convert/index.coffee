@@ -29,9 +29,7 @@ convert.define [ "sublime", Response ], ( _, response ) ->
       status: response.status
       description: response.statusText
       headers: Object.fromEntries response.headers.entries()
-      # TODO sublime should handle bytes
-      # content: await response.bytes()
-      content: await response.text()
+      content: await response.bytes()      
     .get()
 
 export default convert

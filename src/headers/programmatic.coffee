@@ -16,16 +16,11 @@ class Headers extends metaclass()
     Object.assign ( new @ ), { target }
 
   @getters
-    data: -> @target.output.headers
+    data: -> @target.output.headers.data
 
   get: normalize ( name ) ->
     serializer = Serializers.find name
-    if @target.output.headers[ name ]
-      serializer.parse @target.output.headers[ name ]
-
-  set: normalize ( name, value ) ->
-    @target.update ( input ) ->
-      input.headers[ name ] = value
-    @target.output.headers[ name ]
+    if ( @target.output.headers.get name )?
+      serializer.parse @target.output.headers.get name
 
 export default Headers
