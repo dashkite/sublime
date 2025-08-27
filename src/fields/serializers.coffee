@@ -6,7 +6,7 @@ import {
   ContentType
 } from "@dashkite/http-headers"
 
-import Fields from "./fields"
+import Definitions from "./definitions"
 
 List =
   parse: ( value ) -> value.split /\s*,\s*/
@@ -29,7 +29,7 @@ Serializers =
 
   find: ( name ) ->
     serializers[ name ] ?
-      serializers[( Fields.find name ).type ] ?
+      serializers[( Definitions.find name ).type ] ?
         List
 
 export default Serializers

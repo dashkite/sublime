@@ -1,17 +1,21 @@
 import { MediaType, Accept } from "@dashkite/media-type"
-import Rulebase from "@dashkite/athena"
+import Athena from "@dashkite/athena"
 
 import Request from "#request"
-import Headers from "#headers/canonical"
+import Fields from "#fields"
+import State from "#state"
+import clone from "#helpers/clone"
+import equal from "#helpers/equal"
 
-import State from "./state"
 import Status from "./status"
 
-rulebase = Rulebase.make
+rulebase = Athena.make
 
   initialize: ( state ) -> State.make state
 
   clone: ( state ) -> state.clone()
+
+  equal: ( a, b ) -> a.equal b
 
 rulebase.conditions
 
@@ -28,9 +32,10 @@ rulebase.conditions
 rulebase.actions
 
   "set request": ->
-    @output.request ?= await Request
+    @working.request ?= await Request
       .make @input.request
       .get()
+    @output.request = @working.request.data
 
   "set status": -> @output.status = Status.from @input.status
 
@@ -41,9 +46,9 @@ rulebase.actions
 
   "infer status no content": -> @output.status = 204
 
-  "set headers": -> @output.headers ?= ( Headers.from @input.headers )
-  
-  "set empty headers": -> @output.headers ?= Headers.make()
+  "set headers": -> 
+    @working.headers ?= Fields.make @input.headers
+    @output.headers = @working.headers.data
   
 rulebase.rules
 
@@ -67,6 +72,4 @@ rulebase.rules
 
   "set headers": [ "has headers" ]
   
-  "set empty headers": [ "!has headers" ]
-
 export default rulebase

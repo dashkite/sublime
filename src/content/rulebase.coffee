@@ -1,44 +1,49 @@
 import * as Type from "@dashkite/joy/type"
-import Rulebase from "@dashkite/athena"
-import State from "./state"
+import Athena from "@dashkite/athena"
 
-rulebase = Rulebase.make
+import clone from "#helpers/clone"
+import equal from "#helpers/equal"
+
+import State from "#state"
+
+rulebase = Athena.make
 
   initialize: ( state ) -> State.make state
 
   clone: ( state ) -> state.clone()
+
+  equal: ( a, b ) -> a.equal b
 
 rulebase.conditions
   
   "has content": -> @input.content?
   
   "has content-type": -> 
-    ( @output.headers?.get "content-type" )?
+    ( @working.headers?.get "content-type" )?
   
   "is acceptable": ->
-    accept = ( @output.request?.headers.get "accept" )
+    accept = ( @working.request?.headers.get "accept" )
     if accept?
-      accept.supported @[ "content-type" ]
+      accept.supported ( @working.headers.get  "content-type" )
     else true
   
   "headers ready": -> @output.headers?
 
-  "content ready": -> @output.content?
-
-  "content is text": -> Type.isString @input.content
+  "content is text": -> 
+    Type.isString @input.content
 
   "content is bytes": -> ArrayBuffer.isView @input.content
 
   "content-type is binary": ->
-    { type, subtype, mime } = @[ "content-type" ]
+    { type, subtype, mime } = ( @working.headers.get  "content-type" )
     ( /(image|audio|video)/.test type ) ||
       ( /(image|audio|video)/.test mime?.type ) ||
       ( subtype == "octet-stream" ) ||
       ( mime?.subtype == "octet-stream" )
 
   "content-type is json": ->
-    { subtype, mime } = @[ "content-type" ]
-    ( subtype == "json" ) || ( mime.subtype == "json" )
+    { subtype, mime } = ( @working.headers.get  "content-type" )
+    ( subtype == "json" ) || ( mime?.subtype == "json" )
 
   "content ready": -> @output.content?
 
@@ -57,23 +62,29 @@ rulebase.actions
     @output.content = @input.content
 
   "serialize bytes": ->
-    decoder = new TextDecoder @charset 
+    charset = ( @working.headers.get  "content-type" )
+      ?.parameters?.charset ? "utf-8"
+    decoder = new TextDecoder charset 
     @output.content = decoder.decode new Uint8Array @input.content
       
   "serialize to json": ->
-    JSON.stringify @input.content
+    try
+      @output.content = JSON.stringify @input.content
+    catch
+      @output.content = @input.content
 
   "unable to serialize": ->
     @throw new Error "sublime: unable to serialize content"
 
   "set content-length": -> 
-    @output.headers.set "content-length", 
-      @output.content.length
+    @working.headers.set "content-length", @output.content.length
+    @output.headers = @working.headers.data
 
   "remove content headers": ->
-    for [ key, value ] from @output.headers
+    for [ key, value ] from @working.headers
       if key.startsWith "content-"
           @output.headers.remove key
+    @output.headers = @working.headers.data
     
 rulebase.rules
     
@@ -117,10 +128,10 @@ rulebase.rules
     "has content"
     "headers ready"
     "has content-type"
+    "content-type is json"
     "is acceptable"
     "!content is text"
     "!content is bytes"
-    "content-type is json"
   ]
 
   "set content-length": [

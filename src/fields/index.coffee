@@ -1,8 +1,10 @@
 import * as Fn from "@dashkite/joy/function"
 import * as Type from "@dashkite/joy/type"
-import * as Val from "@dashkite/joy/value"
 import { metaclass } from "@dashkite/joy/metaclass"
 import Generic from "@dashkite/generic"
+
+import clone from "#helpers/clone"
+import equal from "#helpers/equal"
 
 import Serializers from "./serializers"
 
@@ -11,29 +13,25 @@ normalize = ( f ) ->
     ( name, args... ) ->
       f.apply @, [ name?.toLowerCase?(), args... ]
 
-class Headers extends metaclass()
+class Fields extends metaclass()
 
-  @make: -> new @
+  @make: ( data = {}) -> 
 
-  @from: ( headers ) ->
+    self = new @
 
-    self = @make()
-
-    if headers?
-      for name, value of headers
-        self.set name, value
+    for name, value of data
+      self.set name, value
 
     self
 
-  constructor: -> 
+  constructor: ->
     super()
     @data = {}
 
-  equal: ( value ) ->
-    ( Type.isKind Headers, value ) &&
-      Val.equal @data, value.data
-
-  get: normalize ( name ) -> @data[ name ]
+  get: normalize ( name ) ->
+    serializer = Serializers.find name
+    if ( @data[ name ] )?
+      serializer.parse @data[ name ]
 
   set: normalize do ->
 
@@ -52,4 +50,9 @@ class Headers extends metaclass()
 
   [ Symbol.iterator ]: -> yield from Object.entries @data
 
-export default Headers
+clone.define [ Fields ], Fn.identity
+
+equal.define [ Fields, Fields ], ( a, b ) ->
+  equal a.data, b.data
+
+export default Fields

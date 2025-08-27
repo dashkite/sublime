@@ -1,5 +1,8 @@
 import { metaclass } from "@dashkite/joy/metaclass"
-import Headers from "#headers/programmatic"
+import Fields from "#fields"
+import clone from "#helpers/clone"
+import equal from "#helpers/equal"
+import isJSON from "#helpers/is-json"
 
 class Value extends metaclass()
 
@@ -22,6 +25,18 @@ class Value extends metaclass()
 
     method: -> @output.method
 
-    headers: -> Headers.make @
+    headers: -> Fields.make @output.headers
+
+    content: -> 
+      if isJSON @headers.get "content-type"
+        JSON.parse @output.content
+      else
+        @output.content
+
+clone.define [ Value ], ( value ) ->
+  Value.make clone value.data
+
+equal.define [ Value, Value ], ( a, b ) ->
+  equal a.data, b.data
 
 export default Value

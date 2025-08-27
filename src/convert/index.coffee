@@ -1,3 +1,4 @@
+import * as Fn from "@dashkite/joy/function"
 import * as Type from "@dashkite/joy/type"
 import Generic from "@dashkite/generic"
 import * as $Request from "../request"
@@ -31,5 +32,7 @@ convert.define [ "sublime", Response ], ( _, response ) ->
       headers: Object.fromEntries response.headers.entries()
       content: await response.bytes()      
     .get()
+
+convert = Fn.curry Fn.binary convert
 
 export default convert

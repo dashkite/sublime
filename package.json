@@ -37,16 +37,21 @@
     "./response/*": {
       "browser": "./build/browser/src/response/*.js",
       "node": "./build/node/src/response/*.js"
+    },
+    "./state": {
+      "browser": "./build/browser/src/state/index.js",
+      "node": "./build/node/src/state/index.js"
     }
+    
   },
   "imports": {
     "#helpers/*": {
       "browser": "./build/browser/src/helpers/*.js",
       "node": "./build/node/src/helpers/*.js"
     },
-    "#headers/*": {
-      "browser": "./build/browser/src/headers/*.js",
-      "node": "./build/node/src/headers/*.js"
+    "#fields": {
+      "browser": "./build/browser/src/fields/index.js",
+      "node": "./build/node/src/fields/index.js"
     },
     "#content/*": {
       "browser": "./build/browser/src/content/*.js",

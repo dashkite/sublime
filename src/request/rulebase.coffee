@@ -1,17 +1,20 @@
 import * as Type from "@dashkite/joy/type"
 import * as Time from "@dashkite/joy/time"
 import { MediaType } from "@dashkite/media-type"
-import Rulebase from "@dashkite/athena"
+import Athena from "@dashkite/athena"
 
-import Headers from "#headers/canonical"
-
+import Fields from "#fields"
 import State from "#state"
+import clone from "#helpers/clone"
+import equal from "#helpers/equal"
 
-rulebase = Rulebase.make
+rulebase = Athena.make
 
   initialize: ( state ) -> State.make state
 
   clone: ( state ) -> state.clone()
+
+  equal: ( a, b ) -> a.equal b
 
 rulebase.conditions
 
@@ -38,7 +41,7 @@ rulebase.conditions
 
   "has content": -> @input.content?
 
-  "has content-type": -> @output.headers?.get "content-type"
+  "has content-type": -> ( @working.headers?.get "content-type" )?
 
   "headers ready": -> @output.headers?
 
@@ -57,10 +60,10 @@ rulebase.actions
   
   "set a default method": -> @output.method = "get"
   
-  "set headers": -> @output.headers = ( Headers.from @input.headers )
-  
-  "set empty headers": -> @output.headers = Headers.make()
-  
+  "set headers": ->
+    @working.headers ?= Fields.make @input.headers
+    @output.headers = @working.headers.data
+    
   "serialize content": -> 
     @output.content = MediaType.serialize type, @input.content
   
@@ -86,9 +89,7 @@ rulebase.rules
   "set a default method": [ "!has a method", "!has content" ]
   
   "set headers": [ "has headers" ]
-  
-  "set empty headers": [ "!has headers" ]
-  
+    
   "throw unsupported url value": [
     "has a url"
     "!url is text"

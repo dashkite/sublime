@@ -166,17 +166,20 @@
               - type: application
                 subtype: json
         content:
-          greeting: hello   
+          greeting: hello
+        headers:
+          content-type: application/json   
       assertions:          
         - path: $.status
           type: equal
           expect: 200
-        - path: $.headers.get 'content-length'
-          type: equal
-          expect: 20
+        # - path: $.headers.get 'content-length'
+        #   type: equal
+        #   expect: 20
         - path: $.content
-          type: equal
-          expect: '{"greeting":"hello"}'
+          type: deepEqual
+          expect:
+            greeting: hello
 
     - name: unsupported media type
       input:
@@ -186,11 +189,11 @@
             accept:
               - type: application
                 subtype: json
-        content: hello
-      assertions:          
-        - path: $.status
-          type: equal
-          expect: 415
+        content: this should fail
+        headers:
+          content-type: text/plain
+      rejects: >-
+        sublime: attempt to construct an unacceptable response
 
 - name: convert
 

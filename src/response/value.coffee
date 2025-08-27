@@ -1,6 +1,9 @@
 import { metaclass } from "@dashkite/joy/metaclass"
 import { MediaType } from "@dashkite/media-type"
-import Headers from "#headers/programmatic"
+import Fields from "#fields"
+import clone from "#helpers/clone"
+import equal from "#helpers/equal"
+import isJSON from "#helpers/is-json"
 
 class Value extends metaclass()
 
@@ -8,6 +11,8 @@ class Value extends metaclass()
     Object.assign ( new @ ), { output }
 
   @getters
+
+    data: -> @output
 
     request: -> @ouput.request
 
@@ -23,18 +28,24 @@ class Value extends metaclass()
 
     method: -> @output.request.method
 
-    headers: -> Headers.make @
+    headers: -> Fields.make @output.headers
 
     status: -> @output.status
 
     description: -> @output.description
 
     content: -> 
-      switch MediaType.category @headers.get "content-type"
-        when "json"
-          JSON.parse @output.content
-        else
-          @output.content
+      if isJSON @headers.get "content-type"
+        JSON.parse @output.content
+      else
+        @output.content
+
+clone.define [ Value ], ( value ) ->
+  Value.make clone value.data
+
+equal.define [ Value, Value ], ( a, b ) ->
+  equal a.data, b.data
+
 
 export default Value
 
