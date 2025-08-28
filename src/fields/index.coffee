@@ -50,7 +50,8 @@ class Fields extends metaclass()
 
   [ Symbol.iterator ]: -> yield from Object.entries @data
 
-clone.define [ Fields ], Fn.identity
+clone.define [ Fields ], ({ data }) ->
+  Fields.make clone data
 
 equal.define [ Fields, Fields ], ( a, b ) ->
   equal a.data, b.data

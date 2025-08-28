@@ -37,13 +37,9 @@ rulebase.conditions
 
   "has a method": -> @input.method?
 
-  "has headers": -> @input.headers?
+  "headers ready": -> @output.headers?
 
   "has content": -> @input.content?
-
-  "has content-type": -> ( @working.headers?.get "content-type" )?
-
-  "headers ready": -> @output.headers?
 
 rulebase.actions
   
@@ -61,7 +57,7 @@ rulebase.actions
   "set a default method": -> @output.method = "get"
   
   "set headers": ->
-    @working.headers ?= Fields.make @input.headers
+    @working.headers ?= Fields.make ( @input.headers ? {} )
     @output.headers = @working.headers.data
     
   "serialize content": -> 
@@ -88,7 +84,7 @@ rulebase.rules
   
   "set a default method": [ "!has a method", "!has content" ]
   
-  "set headers": [ "has headers" ]
+  "set headers": [ "!headers ready" ]
     
   "throw unsupported url value": [
     "has a url"

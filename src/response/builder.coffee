@@ -1,8 +1,8 @@
 import builder from "#builder"
 import content from "#content/rulebase"
 
-import rulebase from "./rulebase"
 import Value from "./value"
+import rulebase from "./rulebase"
 
 class Builder extends builder Value
 

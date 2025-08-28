@@ -31,7 +31,7 @@ builder = ( T ) ->
 
     @getters
       rules: -> Fn.pipe @constructor._rulebases
-      state: -> { @input, @output, @errors }
+      state: -> { @input, @output, @errors, @working }
 
     constructor: ->
       super()
@@ -43,10 +43,9 @@ builder = ( T ) ->
       for await { mutator, resolve, reject } from @updates
         @input = mutator @input
         @output = {}
-        @errors = []
         mulligan = true
         loop
-          { @output, @errors } = await start @rules.apply @state
+          { @output, @errors, @working } = await start @rules.apply @state
           if @errors.length == 0
             resolve @output
             break

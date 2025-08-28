@@ -27,12 +27,15 @@ rulebase.conditions
       accept.supported ( @working.headers.get  "content-type" )
     else true
   
-  "headers ready": -> @output.headers?
-
   "content is text": -> 
     Type.isString @input.content
 
   "content is bytes": -> ArrayBuffer.isView @input.content
+
+  "content is binary": ->
+    ( ArrayBuffer.isView @input.content ) ||
+      ( Type.isKind ArrayBuffer, @input.content ) ||
+      ( Type.isKind Blob, @input.content )
 
   "content-type is binary": ->
     { type, subtype, mime } = ( @working.headers.get  "content-type" )
@@ -46,6 +49,8 @@ rulebase.conditions
     ( subtype == "json" ) || ( mime?.subtype == "json" )
 
   "content ready": -> @output.content?
+  
+  "headers ready": -> @output.headers?
 
 rulebase.actions
 
@@ -53,13 +58,23 @@ rulebase.actions
     @throw new Error "sublime: attempt to construct
       an unacceptable response"
 
-  "set text content": ->
-    @output.content = @input.content
+  "set default content type to text/plain": ->
+    @working.headers.set "content-type", "text/plain"
+    @output.headers = @working.headers.data
+
+  "set default content type to application/json": ->
+    @working.headers.set "content-type", "application/json"
+    @output.headers = @working.headers.data
+
+  "set default content type to application/octet-stream": ->
+    @working.headers.set "content-type", "application/octet-stream"
+    @output.headers = @working.headers.data
+
+  "set text content": -> @output.content = @input.content
     
   # should we try to put this into an appropriate 
   # container, ex: Blob
-  "set binary content": ->
-    @output.content = @input.content
+  "set binary content": -> @output.content = @input.content
 
   "serialize bytes": ->
     charset = ( @working.headers.get  "content-type" )
@@ -83,7 +98,7 @@ rulebase.actions
   "remove content headers": ->
     for [ key, value ] from @working.headers
       if key.startsWith "content-"
-          @output.headers.remove key
+          @working.headers.remove key
     @output.headers = @working.headers.data
     
 rulebase.rules
@@ -92,6 +107,26 @@ rulebase.rules
     "headers ready"
     "has content-type"
     "!is acceptable"
+  ]
+
+  "set default content type to text/plain": [
+    "headers ready"
+    "!has content-type"
+    "content is text"
+  ]
+
+  "set default content type to application/json": [
+    "headers ready"
+    "!has content-type"
+    "!content is text"
+    "!content is binary"
+  ]
+
+  "set default content type to application/octet-stream": [
+    "headers ready"
+    "!has content-type"
+    "!content is text"
+    "content is binary"
   ]
 
   "remove content headers": [

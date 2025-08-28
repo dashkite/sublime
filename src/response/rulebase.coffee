@@ -25,7 +25,7 @@ rulebase.conditions
   
   "has description": -> @input.description?
 
-  "has headers": -> @input.headers?
+  "headers ready": -> @output.headers?
 
   "has content": -> @input.content?
 
@@ -46,10 +46,10 @@ rulebase.actions
 
   "infer status no content": -> @output.status = 204
 
-  "set headers": -> 
-    @working.headers ?= Fields.make @input.headers
+  "set headers": ->
+    @working.headers ?= Fields.make ( @input.headers ? {} )
     @output.headers = @working.headers.data
-  
+
 rulebase.rules
 
   "set request": [ "has request" ]
@@ -70,6 +70,6 @@ rulebase.rules
     "!has content" 
   ]
 
-  "set headers": [ "has headers" ]
+  "set headers": [ "!headers ready" ]
   
 export default rulebase
