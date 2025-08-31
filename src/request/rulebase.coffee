@@ -73,10 +73,16 @@ rulebase.actions
     @throw new Error "sublime: invalid url"
 
 rulebase.rules
+
+  "url is text": [ "has a url" ]
+
+  "url is of type url": [ "has a url" ]
+
+  "valid url": [ "url ready" ]
   
-  "set the url": [ "has a url", "url is text" ]
+  "set the url": [ "url is text" ]
   
-  "convert url to text": [ "has a url", "url is of type url" ]
+  "convert url to text": [ "url is of type url" ]
   
   "construct url from constituents": [ "has an origin" ]
   
@@ -87,13 +93,12 @@ rulebase.rules
   "set headers": [ "!headers ready" ]
     
   "throw unsupported url value": [
-    "has a url"
     "!url is text"
     "!url is of type url" 
   ]
 
-  "throw missing url value": [ "!has a url", "!url ready" ]
+  "throw missing url value": [ "!url ready" ]
 
-  "throw invalid url": [ "url ready", "!valid url" ]
+  "throw invalid url": [ "!valid url" ]
 
 export default rulebase

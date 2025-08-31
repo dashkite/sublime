@@ -1,4 +1,5 @@
 import * as Fn from "@dashkite/joy/function"
+import * as Time from "@dashkite/joy/time"
 import * as Obj from "@dashkite/joy/object"
 import { metaclass } from "@dashkite/joy/metaclass"
 import { Queue } from "@dashkite/joy/iterable"

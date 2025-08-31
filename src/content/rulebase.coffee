@@ -22,9 +22,8 @@ rulebase.conditions
     ( @working.headers?.get "content-type" )?
   
   "is acceptable": ->
-    accept = ( @working.request?.headers.get "accept" )
-    if accept?
-      accept.supported ( @working.headers.get  "content-type" )
+    if ( accept = ( @working.request?.headers.get "accept" ))?
+      accept.supported ( @working.headers.get "content-type" )
     else true
   
   "content is text": -> 
@@ -102,28 +101,29 @@ rulebase.actions
     @output.headers = @working.headers.data
     
 rulebase.rules
+
+  "has content-type": [ "headers ready" ]
+
+  "is acceptable": [ "has content-type" ]
+
+  "content-type is json": [ "has content-type" ]
+
+  "content-type is binary": [ "has content-type" ]
     
-  "not acceptable": [
-    "headers ready"
-    "has content-type"
-    "!is acceptable"
-  ]
+  "not acceptable": [ "!is acceptable" ]
 
   "set default content type to text/plain": [
-    "headers ready"
     "!has content-type"
     "content is text"
   ]
 
   "set default content type to application/json": [
-    "headers ready"
     "!has content-type"
     "!content is text"
     "!content is binary"
   ]
 
   "set default content type to application/octet-stream": [
-    "headers ready"
     "!has content-type"
     "!content is text"
     "content is binary"
@@ -136,24 +136,18 @@ rulebase.rules
 
   "set text content": [
     "has content"
-    "headers ready"
-    "has content-type"
     "is acceptable"
     "content is text"
   ]
 
   "set binary content": [
     "has content"
-    "headers ready"
-    "has content-type"
     "is acceptable"
     "content is bytes"
   ]
 
   "serialize bytes": [
     "has content"
-    "headers ready"
-    "has content-type"
     "is acceptable"
     "content is bytes"
     "!content-type is binary"
@@ -161,8 +155,6 @@ rulebase.rules
 
   "serialize to json": [
     "has content"
-    "headers ready"
-    "has content-type"
     "content-type is json"
     "is acceptable"
     "!content is text"
