@@ -15,19 +15,19 @@
           type: equal
           expect: get
 
-        - path: $.origin
+        - path: $.url.origin
           type: equal
           expect: "https://foobar.com"
 
-        - path: $.domain
+        - path: $.url.domain
           type: equal
           expect: "foobar.com"
 
-        - path: $.target
+        - path: $.url.target
           type: equal
           expect: "/hello?name=world"
 
-        - path: $.query
+        - path: $.url.query
           type: deepEqual
           expect:
             name: world
@@ -39,11 +39,11 @@
 
       assertions:
 
-        - path: $.origin
+        - path: $.url.origin
           type: equal
           expect: "https://foobar.com"
 
-        - path: $.target
+        - path: $.url.target
           type: equal
           expect: "/hello?name=world"
 
@@ -194,7 +194,7 @@
         headers:
           content-type: text/plain
       rejects: >-
-        sublime: attempt to construct an unacceptable response
+        sublime: unacceptable response
 
 - name: convert
 

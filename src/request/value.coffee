@@ -4,6 +4,12 @@ import clone from "#helpers/clone"
 import equal from "#helpers/equal"
 import isJSON from "#helpers/is-json"
 
+class XURL extends metaclass URL
+  @getters
+    domain: -> @hostname
+    target: -> @pathname + @search
+    query: -> Object.fromEntries @searchParams
+
 class Value extends metaclass()
 
   @make: ( output ) ->
@@ -13,15 +19,7 @@ class Value extends metaclass()
 
     data: -> @output
 
-    url: -> new URL @output.url
-
-    domain: -> @url.hostname
-
-    origin: -> @url.origin
-
-    target: -> @url.pathname + @url.search
-
-    query: -> Object.fromEntries @url.searchParams
+    url: -> new XURL @output.url
 
     method: -> @output.method
 

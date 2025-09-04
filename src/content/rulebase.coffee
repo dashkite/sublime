@@ -54,8 +54,7 @@ rulebase.conditions
 rulebase.actions
 
   "not acceptable": ->
-    @throw new Error "sublime: attempt to construct
-      an unacceptable response"
+    @throw new Error "sublime: unacceptable response"
 
   "set default content type to text/plain": ->
     @working.headers.set "content-type", "text/plain"
@@ -89,6 +88,18 @@ rulebase.actions
 
   "unable to serialize": ->
     @throw new Error "sublime: unable to serialize content"
+
+  # We don't need to set the content-length
+  # https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Length
+  #
+  # > In HTTP/2, Content-Length is redundant, because the
+  # > content length may be inferred from DATA frames. It
+  # > may still be included for backwards compatibility.
+  #
+  # We do it anyway for backwards compatibility. We set it
+  # based on the output content which is normalized to
+  # bytes. The `content-length` is the length in bytes, not
+  # the length of string.
 
   "set content-length": -> 
     @working.headers.set "content-length", @output.content.length
