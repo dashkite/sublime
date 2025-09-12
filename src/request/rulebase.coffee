@@ -3,7 +3,7 @@ import * as Time from "@dashkite/joy/time"
 import { MediaType } from "@dashkite/media-type"
 import Athena from "@dashkite/athena"
 
-import Fields from "#fields"
+import { MutableFields } from "#fields"
 import State from "#state"
 import clone from "#helpers/clone"
 import equal from "#helpers/equal"
@@ -57,7 +57,7 @@ rulebase.actions
   "set a default method": -> @output.method = "get"
   
   "set headers": ->
-    @working.headers ?= Fields.make ( @input.headers ? {} )
+    @working.headers ?= MutableFields.make ( @input.headers ? {} )
     @output.headers = @working.headers.data
     
   "serialize content": -> 

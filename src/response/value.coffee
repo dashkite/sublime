@@ -4,6 +4,7 @@ import Fields from "#fields"
 import clone from "#helpers/clone"
 import equal from "#helpers/equal"
 import isJSON from "#helpers/is-json"
+import Request from "#request/value"
 
 class Value extends metaclass()
 
@@ -14,7 +15,7 @@ class Value extends metaclass()
 
     data: -> @output
 
-    request: -> @ouput.request
+    request: -> Request.make @output.request
 
     url: -> new URL @output.request.url
 

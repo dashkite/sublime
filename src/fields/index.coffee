@@ -13,6 +13,19 @@ normalize = ( f ) ->
     ( name, args... ) ->
       f.apply @, [ name?.toLowerCase?(), args... ]
 
+set = normalize do ->
+
+  ( Generic.make "set" ) 
+  
+    .define [ String, Type.isNotNullish ], ( name, value ) ->
+      serializer = Serializers.find name
+      @data[ name ] = serializer.format value
+
+    .define [ String, String ], ( name, value ) ->
+      serializer = Serializers.find name
+      # this validates the value
+      @data[ name ] = serializer.format serializer.parse value    
+
 class Fields extends metaclass()
 
   @make: ( data = {}) -> 
@@ -20,7 +33,7 @@ class Fields extends metaclass()
     self = new @
 
     for name, value of data
-      self.set name, value
+      set.apply self, [ name, value ]
 
     self
 
@@ -33,27 +46,21 @@ class Fields extends metaclass()
     if ( @data[ name ] )?
       serializer.parse @data[ name ]
 
-  set: normalize do ->
+  [ Symbol.iterator ]: -> yield from Object.entries @data
 
-    ( Generic.make "set" ) 
-    
-      .define [ String, Type.isNotNullish ], ( name, value ) ->
-        serializer = Serializers.find name
-        @data[ name ] = serializer.format value
 
-      .define [ String, String ], ( name, value ) ->
-        serializer = Serializers.find name
-        # this validates the value
-        @data[ name ] = serializer.format serializer.parse value    
+class MutableFields extends Fields
+
+  set: ( name, value ) ->
+    set.apply @, [ name, value ]
 
   remove: normalize ( name ) -> delete @data[ name ]
 
-  [ Symbol.iterator ]: -> yield from Object.entries @data
-
-clone.define [ Fields ], ({ data }) ->
-  Fields.make clone data
+clone.define [ Fields ], ( value ) ->
+  value.constructor.make clone value.data
 
 equal.define [ Fields, Fields ], ( a, b ) ->
   equal a.data, b.data
 
+export { Fields, MutableFields }
 export default Fields

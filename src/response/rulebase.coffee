@@ -2,7 +2,7 @@ import { MediaType, Accept } from "@dashkite/media-type"
 import Athena from "@dashkite/athena"
 
 import Request from "#request"
-import Fields from "#fields"
+import { MutableFields } from "#fields"
 import State from "#state"
 import clone from "#helpers/clone"
 import equal from "#helpers/equal"
@@ -52,7 +52,7 @@ rulebase.actions
   "infer status no content": -> @output.status = 204
 
   "set headers": ->
-    @working.headers ?= Fields.make ( @input.headers ? {} )
+    @working.headers ?= MutableFields.make ( @input.headers ? {} )
     @output.headers = @working.headers.data
 
 rulebase.rules
