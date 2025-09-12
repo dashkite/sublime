@@ -1,3 +1,15 @@
+- name: Request Builder
+  scenarios:
+    - name: Update headers after initial get
+      input:
+        url: "https://foobar.com/hello?name=world"
+      assertions:
+        - path: ( $.headers.get "authorization" )
+          type: deepEqual
+          expect: 
+            scheme: foo
+            token: "123"
+
 - name: Request
   scenarios:
 

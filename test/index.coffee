@@ -21,6 +21,17 @@ do ->
 
         .apply
 
+          "Request Builder": 
+            "*": ({ input }) ->
+              builder = $Request.make input
+              await builder.get()
+              builder
+                .update ( input ) ->
+                  input.headers.authorization = "foo 123"
+                  input
+              request = await builder.get()
+              request
+
           "Request":
             "*": ({ input }) -> 
               $Request

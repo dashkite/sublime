@@ -9,13 +9,19 @@ convert = Generic.make "convert"
 convert.define [ Object, Type.isAny ], 
   ({ to }, value ) -> convert to, value
 
+convert.define [ "fetch", $Request.Builder ], (  _, request ) ->
+  convert "fetch", await request.get()
+
 convert.define [ "fetch", $Request.Value ], (  _, request ) ->
   { url, method, headers, content } = request
   new Request url, { 
     method, headers, 
-    body: content, mode: "cors", 
+    body: content, mode: "cors",
     redirect: "follow", priority: "auto" 
   }
+
+convert.define [ "fetch", $Response.Builder ], (  _, response ) ->
+  convert "fetch", await response.get()
 
 convert.define [ "fetch", $Response.Value ], (  _, response ) ->
   # TODO ensure that response.data returns canonical attributes

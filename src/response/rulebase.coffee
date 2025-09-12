@@ -25,6 +25,8 @@ rulebase.conditions
   
   "has description": -> @input.description?
 
+  "status ready": -> @output.status?
+
   "headers ready": -> @output.headers?
 
   "has content": -> @input.content?
@@ -42,6 +44,9 @@ rulebase.actions
   "set status from description": ->
     @output.status = Status.from @input.description
 
+  "set description from status": ->
+    @output.description = Status.description @output.status
+
   "infer status ok": -> @output.status = 200
 
   "infer status no content": -> @output.status = 204
@@ -57,6 +62,8 @@ rulebase.rules
   "set status": [ "has status" ]
 
   "set status from description": [ "!has status", "has description" ]
+
+  "set description from status": [ "status ready" ]
 
   "infer status ok": [
     "!has status"

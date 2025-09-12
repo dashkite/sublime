@@ -27,6 +27,7 @@ builder = ( T ) ->
 
     @make: ( input = {}) ->
       self = new @
+      input.headers ?= {}
       self.update -> input
       self
 
@@ -43,7 +44,10 @@ builder = ( T ) ->
     start: ->
       for await { mutator, resolve, reject } from @updates
         @input = mutator @input
+        @saved = @output
         @output = {}
+        @errors = []
+        @working = {}
         mulligan = true
         loop
           { @output, @errors, @working } = await start @rules.apply @state
@@ -62,10 +66,12 @@ builder = ( T ) ->
       { promise, rest... } = Promise.withResolvers()
       @promises.push promise
       @updates.enqueue { mutator, rest... }
+      @
     
     get: ->
       promises = @promises
       @promises = []
+      output = @saved
       ( output = await promise ) for promise in promises
       T.make output
 

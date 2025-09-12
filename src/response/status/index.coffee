@@ -7,6 +7,9 @@ import data from "./data"
 
 Status =
 
+  description: Fn.memoize ( status ) ->
+    data[ status ]?.toLowerCase()
+
   from: Fn.memoize do ->
     
     Generic.make "Status.from"
