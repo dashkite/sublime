@@ -33,46 +33,29 @@ builder = ( T ) ->
 
     @getters
       rules: -> Fn.pipe @constructor._rulebases
-      state: -> { @input, @output, @errors, @working }
 
-    constructor: ->
-      super()
-      @updates = Queue.make()
-      @promises = []
-      @start()
-
-    start: ->
-      for await { mutator, resolve, reject } from @updates
-        @input = mutator @input
-        @saved = @output
-        @output = {}
-        @errors = []
-        @working = {}
-        mulligan = true
-        loop
-          { @output, @errors, @working } = await start @rules.apply @state
-          if @errors.length == 0
-            resolve @output
-            break
-          else if mulligan
-            mulligan = false
-            @errors = []
-          else
-            # possibly aggregate errors?
-            reject @errors[0]
-            break
-          
     update: ( mutator ) ->
-      { promise, rest... } = Promise.withResolvers()
-      @promises.push promise
-      @updates.enqueue { mutator, rest... }
+      @output = {}
+      @input = mutator @input
       @
     
     get: ->
-      promises = @promises
-      @promises = []
-      output = @saved
-      ( output = await promise ) for promise in promises
-      T.make output
+      @output = {}
+      @errors = []
+      @working = {}
+      mulligan = true
+      loop
+        state = { @input, @output, @errors, @working }
+        { @output, @errors, @working } = await start @rules.apply state
+        if @errors.length == 0
+          break
+        else if mulligan
+          mulligan = false
+          @errors = []
+        else
+          # possibly aggregate errors?
+          break
+      throw @errors[0] if @errors.length > 0
+      T.make @output
 
 export default builder
