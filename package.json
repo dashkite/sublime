@@ -45,8 +45,11 @@
     "./state": {
       "browser": "./build/browser/src/state/index.js",
       "node": "./build/node/src/state/index.js"
+    },
+    "./xurl": {
+      "browser": "./build/browser/src/xurl/index.js",
+      "node": "./build/node/src/xurl/index.js"
     }
-    
   },
   "imports": {
     "#helpers/*": {
@@ -84,6 +87,10 @@
     "#response/*": {
       "browser": "./build/browser/src/response/*.js",
       "node": "./build/node/src/response/*.js"
+    },
+    "#xurl": {
+      "browser": "./build/browser/src/xurl/index.js",
+      "node": "./build/node/src/xurl/index.js"
     }
   },
   "files": [
@@ -114,6 +121,8 @@
     "@dashkite/joy": "link:../joy",
     "@dashkite/media-type": "link:../media-type",
     "@dashkite/reactive": "link:../reactive",
+    "@dashkite/registry": "^0.17.10",
+    "@dashkite/sierra": "link:../sierra",
     "statuses": "^2.0.2"
   }
 }

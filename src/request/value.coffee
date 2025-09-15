@@ -3,12 +3,7 @@ import Fields from "#fields"
 import clone from "#helpers/clone"
 import equal from "#helpers/equal"
 import isJSON from "#helpers/is-json"
-
-class XURL extends metaclass URL
-  @getters
-    domain: -> @hostname
-    target: -> @pathname + @search
-    query: -> Object.fromEntries @searchParams
+import XURL from "#xurl"
 
 class Value extends metaclass()
 

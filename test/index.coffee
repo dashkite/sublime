@@ -3,6 +3,9 @@ import {test, success} from "@dashkite/amen"
 import print from "@dashkite/amen-console"
 import Runner from "@dashkite/runner"
 
+import Sierra from "@dashkite/sierra"
+import Registry from "@dashkite/registry"
+
 import $Request from "../src/request"
 import $Response from "../src/response"
 import convert from "../src/convert"
@@ -14,6 +17,14 @@ do ->
   print await test "Sublime", 
 
     await do ->
+
+      authorizers = Sierra.make()
+      authorizers.add "foo", 
+        matches: -> true
+        get: -> 
+          scheme: "foo"
+          token: "123"
+      await Registry.set "authorizers", authorizers
 
       Runner
 

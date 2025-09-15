@@ -2,6 +2,7 @@ import * as Type from "@dashkite/joy/type"
 import * as Time from "@dashkite/joy/time"
 import { MediaType } from "@dashkite/media-type"
 import Athena from "@dashkite/athena"
+import Registry from "@dashkite/registry"
 
 import { MutableFields } from "#fields"
 import State from "#state"
@@ -41,6 +42,12 @@ rulebase.conditions
 
   "has content": -> @input.content?
 
+  "has authorization": -> 
+    @input.authorization? || @working.authorization?
+
+  "authorization header ready": ->
+    ( @working.headers?.get "authorization" )?
+
 rulebase.actions
   
   "set the url": -> @output.url = @input.url
@@ -52,9 +59,9 @@ rulebase.actions
     url.search = new URLSearchParams @input.query
     @output.url = url.href
   
-  "set the method": -> @output.method = @input.method.toLowerCase()
+  "set method": -> @output.method = @input.method.toLowerCase()
   
-  "set a default method": -> @output.method = "get"
+  "set default method": -> @output.method = "get"
   
   "set headers": ->
     @working.headers ?= MutableFields.make ( @input.headers ? {} )
@@ -62,6 +69,15 @@ rulebase.actions
     
   "serialize content": -> 
     @output.content = MediaType.serialize type, @input.content
+
+  "set authorization header": ->
+    authorizers = await Registry.get "authorizers"
+    context = { url: @output.url, method: @output.method }
+    specifiers = ( @input.authorization ? @working.authorization )
+      .map ({ query, rest... }) -> { rest..., query: { query..., context... }}
+    if ( authorization = await authorizers.authorization specifiers )?
+      @working.headers.set "authorization", authorization
+      @output.headers = @working.headers.data
   
   "throw unsupported url value": ->
     @throw new Error "sublime: unsupported url value"
@@ -86,11 +102,18 @@ rulebase.rules
   
   "construct url from constituents": [ "has an origin" ]
   
-  "set the method": [ "has a method" ]
+  "set method": [ "has a method" ]
   
-  "set a default method": [ "!has a method", "!has content" ]
+  "set default method": [ "!has a method", "!has content" ]
   
   "set headers": [ "!headers ready" ]
+
+  "authorization header ready": [ "headers ready" ]
+
+  "set authorization header": [ 
+    "!authorization header ready"
+    "has authorization" 
+  ]
     
   "throw unsupported url value": [
     "!url is text"

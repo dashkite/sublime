@@ -85,6 +85,19 @@
         #   type: deepEqual
         #   expect: text/plain
 
+    - name: with authorization
+      input:
+        url: "https://foobar.com/hello?name=world"
+        authorization:
+          - challenge:
+                scheme: foo
+      assertions:
+        - path: $.headers.get "authorization"
+          type: deepEqual
+          expect:
+            scheme: foo
+            token: "123"
+
 - name: Response
   scenarios:
 
