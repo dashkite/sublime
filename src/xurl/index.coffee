@@ -6,5 +6,4 @@ class XURL extends metaclass URL
     target: -> @pathname + @search
     query: -> Object.fromEntries @searchParams
 
-
 export default XURL

@@ -73,7 +73,17 @@ rulebase.actions
   "set authorization header": ->
     authorizers = await Registry.get "authorizers"
     context = { url: @output.url, method: @output.method }
+    # normalize specifier: can be text (the scheme) or a challenge 
+    # (has a `scheme` property) or challenge and query
     specifiers = ( @input.authorization ? @working.authorization )
+      .map ( value ) ->
+        if value.challenge?
+          value
+        else if value.scheme?
+          challenge: value
+        else
+          challenge: 
+            scheme: value
       .map ({ query, rest... }) -> { rest..., query: { query..., context... }}
     if ( authorization = await authorizers.authorization specifiers )?
       @working.headers.set "authorization", authorization
@@ -87,6 +97,9 @@ rulebase.actions
   
   "throw invalid url": ->
     @throw new Error "sublime: invalid url"
+
+  "throw missing method": ->
+    @throw new Error "sublime: missing method"
 
 rulebase.rules
 
@@ -123,5 +136,7 @@ rulebase.rules
   "throw missing url value": [ "!url ready" ]
 
   "throw invalid url": [ "!valid url" ]
+
+  "throw missing method": [ "!has a method", "has content" ]
 
 export default rulebase
