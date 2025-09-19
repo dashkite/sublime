@@ -103,16 +103,16 @@
     "release": "genie release"
   },
   "devDependencies": {
-    "@dashkite/amen": "^0.9.9",
+    "@dashkite/amen": "^0.9.10",
     "@dashkite/amen-console": "^0.8.9",
-    "@dashkite/assert": "^0.7.15",
+    "@dashkite/assert": "^0.7.16",
     "@dashkite/genie": "0.20.4",
     "@dashkite/genie-clean": "0.13.1",
     "@dashkite/genie-coffee": "0.13.1",
     "@dashkite/genie-module": "^0.5.40",
     "@dashkite/genie-release": "^0.4.3",
     "@dashkite/genie-yaml": "0.11.1",
-    "@dashkite/runner": "^0.1.0"
+    "@dashkite/runner": "^0.1.3"
   },
   "dependencies": {
     "@dashkite/athena": "link:../athena",
