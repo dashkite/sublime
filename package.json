@@ -104,15 +104,15 @@
   },
   "devDependencies": {
     "@dashkite/amen": "^0.9.12",
-    "@dashkite/amen-console": "^0.8.11",
-    "@dashkite/assert": "^0.7.17",
+    "@dashkite/amen-console": "^0.8.12",
+    "@dashkite/assert": "^0.7.18",
     "@dashkite/genie": "0.20.4",
     "@dashkite/genie-clean": "0.13.1",
     "@dashkite/genie-coffee": "0.13.1",
     "@dashkite/genie-module": "^0.5.42",
     "@dashkite/genie-release": "^0.4.3",
     "@dashkite/genie-yaml": "0.11.1",
-    "@dashkite/runner": "^0.1.5"
+    "@dashkite/runner": "^0.1.6"
   },
   "dependencies": {
     "@dashkite/athena": "link:../athena",
