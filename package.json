@@ -1,6 +1,6 @@
 {
   "name": "@dashkite/sublime",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Canonical HTTP request and response format, with accessors and mutators",
   "keywords": [],
   "homepage": "https://github.com/dashkite/sublime#readme",
