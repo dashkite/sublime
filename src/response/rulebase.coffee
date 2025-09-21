@@ -1,7 +1,6 @@
 import { MediaType, Accept } from "@dashkite/media-type"
 import Athena from "@dashkite/athena"
 
-import Request from "#request"
 import { MutableFields } from "#fields"
 import State from "#state"
 import clone from "#helpers/clone"
@@ -9,74 +8,78 @@ import equal from "#helpers/equal"
 
 import Status from "./status"
 
-rulebase = Athena.make
+rulebase = ( Request ) ->
 
-  initialize: ( state ) -> State.make state
+  _rulebase = Athena.make
 
-  clone: ( state ) -> state.clone()
+    initialize: ( state ) -> State.make state
 
-  equal: ( a, b ) -> a.equal b
+    clone: ( state ) -> state.clone()
 
-rulebase.conditions
+    equal: ( a, b ) -> a.equal b
 
-  "has request": -> @input.request?
+  _rulebase.conditions
 
-  "has status": -> @input.status?
-  
-  "has description": -> @input.description?
+    "has request": -> @input.request?
 
-  "status ready": -> @output.status?
+    "has status": -> @input.status?
+    
+    "has description": -> @input.description?
 
-  "headers ready": -> @output.headers?
+    "status ready": -> @output.status?
 
-  "has content": -> @input.content?
+    "headers ready": -> @output.headers?
 
-rulebase.actions
+    "has content": -> @input.content?
 
-  "set request": ->
-    @working.request ?= await Request
-      .make @input.request
-      .get()
-    @output.request = @working.request.data
+  _rulebase.actions
 
-  "set status": -> @output.status = Status.from @input.status
+    "set request": ->
+      @working.request ?= await Request.Builder
+        .make @input.request
+        .get()
+      @output.request = @working.request.data
 
-  "set status from description": ->
-    @output.status = Status.from @input.description
+    "set status": -> @output.status = Status.from @input.status
 
-  "set description from status": ->
-    @output.description = Status.description @output.status
+    "set status from description": ->
+      @output.status = Status.from @input.description
 
-  "infer status ok": -> @output.status = 200
+    "set description from status": ->
+      @output.description = Status.description @output.status
 
-  "infer status no content": -> @output.status = 204
+    "infer status ok": -> @output.status = 200
 
-  "set headers": ->
-    @working.headers ?= MutableFields.make ( @input.headers ? {} )
-    @output.headers = @working.headers.data
+    "infer status no content": -> @output.status = 204
 
-rulebase.rules
+    "set headers": ->
+      @working.headers ?= MutableFields.make ( @input.headers ? {} )
+      @output.headers = @working.headers.data
 
-  "set request": [ "has request" ]
+  _rulebase.rules
 
-  "set status": [ "has status" ]
+    "set request": [ "has request" ]
 
-  "set status from description": [ "!has status", "has description" ]
+    "set status": [ "has status" ]
 
-  "set description from status": [ "status ready" ]
+    "set status from description": [ "!has status", "has description" ]
 
-  "infer status ok": [
-    "!has status"
-    "!has description"
-    "has content" 
-  ]
+    "set description from status": [ "status ready" ]
 
-  "infer status no content": [
-    "!has status"
-    "!has description"
-    "!has content" 
-  ]
+    "infer status ok": [
+      "!has status"
+      "!has description"
+      "has content" 
+    ]
 
-  "set headers": [ "!headers ready" ]
+    "infer status no content": [
+      "!has status"
+      "!has description"
+      "!has content" 
+    ]
+
+    "set headers": [ "!headers ready" ]
+
+  _rulebase
   
 export default rulebase

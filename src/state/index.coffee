@@ -17,6 +17,7 @@ class State extends metaclass()
 
   equal: ( value ) -> equal @, value
 
+  # TODO avoid adding duplicate errors
   throw: ( error ) -> @errors.push error
 
 clone.define [ State ], ( target ) ->

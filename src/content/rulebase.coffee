@@ -15,7 +15,7 @@ rulebase = Athena.make
   equal: ( a, b ) -> a.equal b
 
 rulebase.conditions
-  
+
   "has content": -> @input.content?
   
   "has content-type": -> 

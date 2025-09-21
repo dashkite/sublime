@@ -6,8 +6,7 @@ import Runner from "@dashkite/runner"
 import Sierra from "@dashkite/sierra"
 import Registry from "@dashkite/registry"
 
-import $Request from "../src/request"
-import $Response from "../src/response"
+import Sublime from "../src"
 import convert from "../src/convert"
 
 import scenarios from "./scenarios"
@@ -26,6 +25,8 @@ do ->
           token: "123"
       await Registry.set "authorizers", authorizers
 
+      $ = Sublime.make()
+
       Runner
 
         .make scenarios
@@ -34,7 +35,7 @@ do ->
 
           "Request Builder": 
             "*": ({ input }) ->
-              builder = $Request.make input
+              builder = $.Request.Builder.make input
               await builder.get()
               builder
                 .update ( input ) ->
@@ -45,13 +46,13 @@ do ->
 
           "Request":
             "*": ({ input }) -> 
-              $Request
+              $.Request.Builder
                 .make input
                 .get()
 
           "Response":
             "*": ({ input }) ->
-              $Response
+              $.Response.Builder
                 .make input
                 .get()
 
@@ -59,7 +60,7 @@ do ->
             "request": 
               "*": ({ input }) ->
                 convert "fetch", 
-                  await $Request
+                  await $.Request.Builder
                     .make input
                     .get()
 

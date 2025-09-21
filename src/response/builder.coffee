@@ -1,11 +1,15 @@
-import builder from "#builder"
+import $builder from "#builder"
 import content from "#content/rulebase"
 
 import Value from "./value"
 import rulebase from "./rulebase"
 
-class Builder extends builder Value
+builder = ( Request, rulebases ) ->
+  
+  class Builder extends $builder Value
 
-  @rulebases [ rulebase, content ]
+    @rulebases [( rulebase Request ), content, rulebases... ]
 
-export default Builder
+  { Builder, Value }
+
+export default builder

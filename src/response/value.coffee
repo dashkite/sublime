@@ -33,6 +33,8 @@ class Value extends metaclass()
 
     status: -> @output.status
 
+    ok: -> 200 <= @status < 300
+
     description: -> @output.description
 
     content: -> 
