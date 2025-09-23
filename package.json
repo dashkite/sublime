@@ -112,7 +112,7 @@
     "@dashkite/genie-module": "^0.5.42",
     "@dashkite/genie-release": "^0.5.0",
     "@dashkite/genie-yaml": "0.11.1",
-    "@dashkite/runner": "link:../runner"
+    "@dashkite/runner": "^0.1.7"
   },
   "dependencies": {
     "@dashkite/athena": "link:../athena",
