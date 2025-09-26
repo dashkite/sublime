@@ -8,9 +8,9 @@ import equal from "#helpers/equal"
 
 import Status from "./status"
 
-rulebase = ( Request ) ->
+rules = ( Request ) ->
 
-  _rulebase = Athena.make
+  _rules = Athena.make
 
     initialize: ( state ) -> State.make state
 
@@ -18,68 +18,81 @@ rulebase = ( Request ) ->
 
     equal: ( a, b ) -> a.equal b
 
-  _rulebase.conditions
+  _rules
 
-    "has request": -> @input.request?
+    .condition  
+      name: "has request"
+      run: -> @input.request?
 
-    "has status": -> @input.status?
-    
-    "has description": -> @input.description?
+    .condition  
+      name: "has status"
+      run: -> @input.status?
+      
+    .condition  
+      name: "has description"
+      run: -> @input.description?
 
-    "status ready": -> @output.status?
+    .condition  
+      name: "status ready"
+      run: -> @output.status?
 
-    "headers ready": -> @output.headers?
+    .condition  
+      name: "headers ready"
+      run: -> @output.headers?
 
-    "has content": -> @input.content?
+    .condition  
+      name: "has content"
+      run: -> @input.content?
 
-  _rulebase.actions
+    .action  
+      name: "set request"
+      when: [ "has request" ]
+      run: ->
+        @working.request ?= await Request.Builder
+          .make @input.request
+          .get()
+        @output.request = @working.request.data
 
-    "set request": ->
-      @working.request ?= await Request.Builder
-        .make @input.request
-        .get()
-      @output.request = @working.request.data
+    .action  
+      name: "set status"
+      when: [ "has status" ]
+      run: -> @output.status = Status.from @input.status
 
-    "set status": -> @output.status = Status.from @input.status
+    .action  
+      name: "set status from description"
+      when: [ "!has status", "has description" ]
+      run: ->
+        @output.status = Status.from @input.description
 
-    "set status from description": ->
-      @output.status = Status.from @input.description
+    .action  
+      name: "set description from status"
+      when: [ "status ready" ]
+      run: ->
+        @output.description = Status.description @output.status
 
-    "set description from status": ->
-      @output.description = Status.description @output.status
+    .action  
+      name: "infer status ok"
+      when: [
+        "!has status"
+        "!has description"
+        "has content" 
+      ]
+      run: -> @output.status = 200
 
-    "infer status ok": -> @output.status = 200
+    .action  
+      name: "infer status no content"
+      when: [
+        "!has status"
+        "!has description"
+        "!has content" 
+      ]
+      run: -> @output.status = 204
 
-    "infer status no content": -> @output.status = 204
-
-    "set headers": ->
-      @working.headers ?= MutableFields.make ( @input.headers ? {} )
-      @output.headers = @working.headers.data
-
-  _rulebase.rules
-
-    "set request": [ "has request" ]
-
-    "set status": [ "has status" ]
-
-    "set status from description": [ "!has status", "has description" ]
-
-    "set description from status": [ "status ready" ]
-
-    "infer status ok": [
-      "!has status"
-      "!has description"
-      "has content" 
-    ]
-
-    "infer status no content": [
-      "!has status"
-      "!has description"
-      "!has content" 
-    ]
-
-    "set headers": [ "!headers ready" ]
-
-  _rulebase
+    .action  
+      name: "set headers"
+      when: [ "!headers ready" ]
+      run: ->
+        @working.headers ?= MutableFields.make ( @input.headers ? {} )
+        @output.headers = @working.headers.data
   
-export default rulebase
+export default rules

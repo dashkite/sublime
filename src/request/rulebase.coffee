@@ -9,7 +9,7 @@ import State from "#state"
 import clone from "#helpers/clone"
 import equal from "#helpers/equal"
 
-rulebase = Athena.make
+rules = Athena.make
 
   initialize: ( state ) -> State.make state
 
@@ -17,126 +17,153 @@ rulebase = Athena.make
 
   equal: ( a, b ) -> a.equal b
 
-rulebase.conditions
+rules
 
-  "has a url": -> @input.url?
+  .condition
+    name: "has a url"
+    run: -> @input.url?
 
-  "url is text": -> Type.isString @input.url
+  .condition
+    name: "url is text"
+    when: [ "has a url" ]
+    run: -> Type.isString @input.url
 
-  "url is of type url": -> Type.isKind URL, @input.url
+  .condition
+    name: "url is of type url"
+    when: [ "has a url" ]
+    run: -> Type.isKind URL, @input.url
 
-  "url ready": -> @output.url?
+  .condition
+    name: "url ready"
+    run: -> @output.url?
 
-  "valid url": -> 
-    try
-      ( new URL @output.url )
-      true
-    catch
-      false
+  .condition
+    name: "valid url"
+    when: [ "url ready" ]
+    run: -> 
+      try
+        ( new URL @output.url )
+        true
+      catch
+        false
 
-  "has an origin": -> @input.origin?
+  .condition
+    name: "has an origin"
+    run: -> @input.origin?
 
-  "has a method": -> @input.method?
+  .condition
+    name: "has a method"
+    run: -> @input.method?
 
-  "headers ready": -> @output.headers?
+  .condition
+    name: "headers ready"
+    run: -> @output.headers?
 
-  "has content": -> @input.content?
+  .condition
+    name: "has content"
+    run: -> @input.content?
 
-  "has authorization": -> 
-    @input.authorization? || @working.authorization?
+  .condition
+    name: "has authorization"
+    run: -> 
+      @input.authorization? || @working.authorization?
 
-  "authorization header ready": ->
-    ( @working.headers?.get "authorization" )?
+  .condition
+    name: "authorization header ready"
+    when: [ "headers ready" ]
+    run: ->
+      ( @working.headers?.get "authorization" )?
 
-rulebase.actions
+  .action
+    name: "set the url"
+    when: [ "url is text" ]
+    run: -> @output.url = @input.url
   
-  "set the url": -> @output.url = @input.url
+  .action
+    name: "convert url to text"
+    when: [ "url is of type url" ]
+    run: ->  @output.url = @input.url.toString()
   
-  "convert url to text": ->  @output.url = @input.url.toString()
-  
-  "construct url from constituents": ->
-    url = new URL ( @input.target ? "/" ), @input.origin
-    url.search = new URLSearchParams @input.query
-    @output.url = url.href
-  
-  "set method": -> @output.method = @input.method.toLowerCase()
-  
-  "set default method": -> @output.method = "get"
-  
-  "set headers": ->
-    @working.headers ?= MutableFields.make ( @input.headers ? {} )
-    @output.headers = @working.headers.data
-    
-  "serialize content": -> 
-    @output.content = MediaType.serialize type, @input.content
+  .action
+    name: "construct url from constituents"
+    when: [ "has an origin" ]
+    run: ->
+      url = new URL ( @input.target ? "/" ), @input.origin
+      url.search = new URLSearchParams @input.query
+      @output.url = url.href
 
-  "set authorization header": ->
-    authorizers = await Registry.get "authorizers"
-    context = { url: @output.url, method: @output.method }
-    # normalize specifier: can be text (the scheme) or a challenge 
-    # (has a `scheme` property) or challenge and query
-    specifiers = ( @input.authorization ? @working.authorization )
-      .map ( value ) ->
-        if value.challenge?
-          value
-        else if value.scheme?
-          challenge: value
-        else
-          challenge: 
-            scheme: value
-      .map ({ query, rest... }) -> { rest..., query: { query..., context... }}
-    if ( authorization = await authorizers.authorization specifiers )?
-      @working.headers.set "authorization", authorization
+  .action
+    name: "set method"
+    when: [ "has a method" ]
+    run: -> @output.method = @input.method.toLowerCase()
+  
+  .action
+    name: "set default method"
+    when: [ "!has a method", "!has content" ]
+    run: -> @output.method = "get"
+  
+  .action
+    name: "set headers"
+    when: [ "!headers ready" ]
+    run: ->
+      @working.headers ?= MutableFields.make ( @input.headers ? {} )
       @output.headers = @working.headers.data
+      
+  .action
+    name: "serialize content"
+    run: -> 
+      @output.content = MediaType.serialize type, @input.content
+
+  .action
+    name: "set authorization header"
+    when: [ 
+      "!authorization header ready"
+      "has authorization" 
+    ]
+    run: ->
+      authorizers = await Registry.get "authorizers"
+      context = { url: @output.url, method: @output.method }
+      # normalize specifier: can be text (the scheme) or a challenge 
+      # (has a `scheme` property) or challenge and query
+      specifiers = ( @input.authorization ? @working.authorization )
+        .map ( value ) ->
+          if value.challenge?
+            value
+          else if value.scheme?
+            challenge: value
+          else
+            challenge: 
+              scheme: value
+        .map ({ query, rest... }) -> { rest..., query: { query..., context... }}
+      if ( authorization = await authorizers.authorization specifiers )?
+        @working.headers.set "authorization", authorization
+        @output.headers = @working.headers.data
   
-  "throw unsupported url value": ->
-    @throw new Error "sublime: unsupported url value"
+  .action
+    name: "throw unsupported url value"
+    when: [
+      "!url is text"
+      "!url is of type url" 
+    ]
+    run: ->
+      @throw new Error "sublime: unsupported url value"
 
-  "throw missing url value": ->
-    @throw new Error "sublime: missing url value"
+  .action
+    name: "throw missing url value"
+    when: [ "!url ready" ]
+    run: ->
+      @throw new Error "sublime: missing url value"
   
-  "throw invalid url": ->
-    @throw new Error "sublime: invalid url"
+  .action
+    name: "throw invalid url"
+    when: [ "!valid url" ]
+    run: ->
+      @throw new Error "sublime: invalid url"
 
-  "throw missing method": ->
-    @throw new Error "sublime: missing method"
+  .action
+    name: "throw missing method"
+    when: [ "!has a method", "has content" ]
+    run: ->
+      @throw new Error "sublime: missing method"
 
-rulebase.rules
-
-  "url is text": [ "has a url" ]
-
-  "url is of type url": [ "has a url" ]
-
-  "valid url": [ "url ready" ]
-  
-  "set the url": [ "url is text" ]
-  
-  "convert url to text": [ "url is of type url" ]
-  
-  "construct url from constituents": [ "has an origin" ]
-  
-  "set method": [ "has a method" ]
-  
-  "set default method": [ "!has a method", "!has content" ]
-  
-  "set headers": [ "!headers ready" ]
-
-  "authorization header ready": [ "headers ready" ]
-
-  "set authorization header": [ 
-    "!authorization header ready"
-    "has authorization" 
-  ]
-    
-  "throw unsupported url value": [
-    "!url is text"
-    "!url is of type url" 
-  ]
-
-  "throw missing url value": [ "!url ready" ]
-
-  "throw invalid url": [ "!valid url" ]
-
-  "throw missing method": [ "!has a method", "has content" ]
-
-export default rulebase
+export default rules  
