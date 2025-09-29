@@ -29,7 +29,7 @@ Serializers =
 
   find: ( name ) ->
     serializers[ name ] ?
-      serializers[( Definitions.find name ).type ] ?
+      serializers[( Definitions.find name )?.type ] ?
         List
 
 export default Serializers
