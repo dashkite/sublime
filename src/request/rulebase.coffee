@@ -1,6 +1,5 @@
 import * as Type from "@dashkite/joy/type"
 import * as Time from "@dashkite/joy/time"
-import { MediaType } from "@dashkite/media-type"
 import Athena from "@dashkite/athena"
 import Registry from "@dashkite/registry"
 
@@ -64,6 +63,10 @@ rules
     run: -> @input.content?
 
   .condition
+    name: "content ready"
+    run: -> @output.content?
+
+  .condition
     name: "has authorization"
     run: -> 
       @input.authorization? || @working.authorization?
@@ -109,11 +112,6 @@ rules
       @working.headers ?= MutableFields.make ( @input.headers ? {} )
       @output.headers = @working.headers.data
       
-  .action
-    name: "serialize content"
-    run: -> 
-      @output.content = MediaType.serialize type, @input.content
-
   .action
     name: "set authorization header"
     when: [ 

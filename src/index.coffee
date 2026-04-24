@@ -1,6 +1,7 @@
 import request from "./request"
 import response from "./response"
 import convert from "./convert"
+import Status from "./response/status"
 
 Fetch =
   Response: Response
@@ -23,7 +24,7 @@ Sublime =
       Response.Builder
         .make
           status: response.status
-          description: response.statusText
+          description: Status.description response.status
           headers: Object.fromEntries response.headers.entries()
           content: await response.bytes()      
         .get()

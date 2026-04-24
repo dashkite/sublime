@@ -9,7 +9,7 @@ convert.define [ Object, Type.isAny ],
   ({ to }, value ) -> convert to, value
 
 convert.define [ "fetch", RequestValue ], (  _, request ) ->
-  { url, method, headers, content } = request
+  { url, method, headers, data: { content } } = request
   new Request url, { 
     method, headers, 
     body: content, mode: "cors",

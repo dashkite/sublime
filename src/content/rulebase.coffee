@@ -16,191 +16,171 @@ rules = Athena.make
 
 rules
 
-  .condition [
-    "has content"
-    -> @input.content?
-  ]
+  .condition
+    name: "has content"
+    run: -> @input.content?
   
-  .condition [
-    "has content-type"
-    [ "headers ready" ]
-    -> ( @working.headers?.get "content-type" )?
-  ]
+  .condition
+    name: "has content-type"
+    when: [ "headers ready" ]
+    run: -> ( @working.headers?.get "content-type" )?
 
-  .condition [
-    "is acceptable"
-    [ "has content-type" ]
-    ->
+  .condition
+    name: "is acceptable"
+    when: [ "has content-type" ]
+    run: ->
       if ( accept = ( @working.request?.headers.get "accept" ))?
         accept.supported ( @working.headers.get "content-type" )
       else true
-  ]
   
-  .condition [
-    "content is text"
-    [ "has content" ]
-    -> Type.isString @input.content
-  ]
+  .condition
+    name: "content is text"
+    when: [ "has content" ]
+    run: -> Type.isString @input.content
 
-  .condition [
-    "content is bytes"
-    [ "has content" ]
-    -> ArrayBuffer.isView @input.content
-  ]
+  .condition
+    name: "content is bytes"
+    when: [ "has content" ]
+    run: -> ArrayBuffer.isView @input.content
 
-  .condition [
-    "content is binary"
-    [ "has content" ]
-    ->
+  .condition
+    name: "content is binary"
+    when: [ "has content" ]
+    run: ->
       ( Type.isKind ArrayBuffer, @input.content ) ||
       ( Type.isKind Blob, @input.content )
-  ]
 
-  .condition [
-    "content-type is binary"
-     [ "has content-type" ]
-    ->
+  .condition
+    name: "content-type is binary"
+    when: [ "has content-type" ]
+    run: ->
       { type, subtype, mime } = ( @working.headers.get "content-type" )
       ( /(image|audio|video)/.test type ) ||
         ( /(image|audio|video)/.test mime?.type ) ||
         ( subtype == "octet-stream" ) ||
         ( mime?.subtype == "octet-stream" )
-  ]
 
-  .condition [
-    "content-type is json"
-    [ "has content-type" ]
-    ->
+  .condition
+    name: "content-type is json"
+    when: [ "has content-type" ]
+    run: ->
       { subtype, mime } = ( @working.headers.get "content-type" )
       ( subtype == "json" ) || ( mime?.subtype == "json" )
-  ]
 
-  .condition [
-    "content ready"
-    -> @output.content?
-  ]
+  .condition
+    name: "content ready"
+    run: -> @output.content?
 
-  .condition [
-    "headers ready"
-    -> @output.headers?
-  ]
+  .condition
+    name: "headers ready"
+    run: -> @output.headers?
 
-  .action [
-    "not acceptable"
-    [ "!is acceptable" ]
-    -> @throw new Error "sublime: unacceptable response"
-  ]
+  .action
+    name: "not acceptable"
+    when: [ "!is acceptable" ]
+    run: -> @throw new Error "sublime: unacceptable response"
 
-  .action [
-    "set default content type to text/plain"
-    [
+  .action
+    name: "set default content type to text/plain"
+    when: [
       "!has content-type"
       "content is text"
     ]
-    ->
+    run: ->
       @working.headers.set "content-type", "text/plain"
       @output.headers = @working.headers.data
-  ]
 
-  .action [
-    "set default content type to application/json"
-    [
+  .action
+    name: "set default content type to application/json"
+    when: [
       "!has content-type"
       "!content is text"
       "!content is binary"
     ]
-    ->
+    run: ->
       @working.headers.set "content-type", "application/json"
       @output.headers = @working.headers.data    
-  ]
 
-  .action [
-    "set default content type to application/octet-stream"
-    [
+  .action
+    name: "set default content type to application/octet-stream"
+    when: [
       "!has content-type"
       "!content is text"
       "content is binary"
     ]
-    ->
+    run: ->
       @working.headers.set "content-type", "application/octet-stream"
       @output.headers = @working.headers.data
-  ]
 
-  .action [
-    "set text content"
-    [
+  .action
+    name: "set text content"
+    when: [
       "content is text"
       "is acceptable"
     ]
-    -> @output.content = @input.content
-  ]
+    run: -> @output.content = @input.content
 
   # should we try to put this into an appropriate 
   # container, ex: Blob
-  .action [
-    "set binary content"
-    [
+  .action
+    name: "set binary content"
+    when: [
       "has content"
       "is acceptable"
       "content is bytes"
     ]
-    -> @output.content = @input.content
-  ]
+    run: -> @output.content = @input.content
 
-  .action [
-    "serialize to bytes"
-    [
+  .action
+    name: "serialize to bytes"
+    when: [
       "has content"
       "is acceptable"
       "content is bytes"
       "!content-type is binary"
     ]
-    ->
+    run: ->
       charset = ( @working.headers.get  "content-type" )
         ?.parameters?.charset ? "utf-8"
       decoder = new TextDecoder charset 
       @output.content = decoder.decode new Uint8Array @input.content
-  ]
 
-  .action [
-    "serialize to json"
-    [
+  .action
+    name: "serialize to json"
+    when: [
       "has content"
       "content-type is json"
       "is acceptable"
       "!content is text"
       "!content is bytes"
     ]
-    ->
+    run: ->
       try
         @output.content = JSON.stringify @input.content
       catch
         @output.content = @input.content
-  ]
 
   # see ./notes re: content-length
-  .action [
-    "set content-length"
-    [
+  .action
+    name: "set content-length"
+    when: [
       "headers ready"
       "content ready"
     ]
-    -> 
+    run: -> 
       @working.headers.set "content-length", @output.content.length
       @output.headers = @working.headers.data
-  ]
 
-  .action [
-    "remove content headers"
-    [
+  .action
+    name: "remove content headers"
+    when: [
       "!has content"
       "headers ready"
     ]
-    ->
+    run: ->
       for [ key, value ] from @working.headers
         if key.startsWith "content-"
             @working.headers.remove key
       @output.headers = @working.headers.data
-  ]
 
 export default rules
