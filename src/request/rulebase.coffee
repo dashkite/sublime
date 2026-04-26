@@ -72,6 +72,12 @@ rules
       @input.authorization? || @working.authorization?
 
   .condition
+    name: "authorization is well-formed"
+    when: [ "has authorization" ]
+    run: ->
+      Type.isArray ( @input.authorization ? @working.authorization )
+
+  .condition
     name: "authorization header ready"
     when: [ "headers ready" ]
     run: ->
@@ -116,7 +122,7 @@ rules
     name: "set authorization header"
     when: [ 
       "!authorization header ready"
-      "has authorization" 
+      "authorization is well-formed" 
     ]
     run: ->
       authorizers = await Registry.get "authorizers"
@@ -137,6 +143,15 @@ rules
         @working.headers.set "authorization", authorization
         @output.headers = @working.headers.data
   
+  .action
+    name: "throw ill-formed authorization"
+    when: [ 
+      "has authorization"
+      "!authorization is well-formed"
+    ]
+    run: ->
+      @throw new Error "sublime: ill-formed authorization"
+
   .action
     name: "throw unsupported url value"
     when: [

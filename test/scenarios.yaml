@@ -98,6 +98,13 @@
             scheme: foo
             token: "123"
 
+    - name: ill-formed authorization
+      input:
+        url: "https://foobar.com/hello"
+        authorization: "bearer"
+      rejects: >-
+        sublime: ill-formed authorization
+
 - name: Response
   scenarios:
 
