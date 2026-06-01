@@ -103,26 +103,26 @@
     "release": "genie release"
   },
   "devDependencies": {
-    "@dashkite/amen": "^0.9.20",
-    "@dashkite/amen-console": "^0.8.17",
-    "@dashkite/assert": "^0.7.23",
+    "@dashkite/amen": "^0.9.22",
+    "@dashkite/amen-console": "^0.8.19",
+    "@dashkite/assert": "^0.7.25",
     "@dashkite/genie": "0.20.4",
     "@dashkite/genie-clean": "0.13.1",
     "@dashkite/genie-coffee": "0.13.1",
-    "@dashkite/genie-module": "^0.5.47",
-    "@dashkite/genie-release": "^0.5.6",
+    "@dashkite/genie-module": "^0.5.49",
+    "@dashkite/genie-release": "^0.5.8",
     "@dashkite/genie-yaml": "0.11.1",
-    "@dashkite/runner": "^0.1.16"
+    "@dashkite/runner": "^0.1.18"
   },
   "dependencies": {
     "@dashkite/athena": "link:../athena",
     "@dashkite/generic": "0.9.1",
-    "@dashkite/http-headers": "^0.12.42",
-    "@dashkite/joy": "^0.12.30",
+    "@dashkite/http-headers": "^0.12.44",
+    "@dashkite/joy": "^0.12.31",
     "@dashkite/media-type": "^0.9.0",
     "@dashkite/reactive": "^0.7.26",
-    "@dashkite/registry": "^0.17.17",
-    "@dashkite/sierra": "^0.3.22",
+    "@dashkite/registry": "^0.17.18",
+    "@dashkite/sierra": "^0.3.24",
     "statuses": "^2.0.2"
   }
 }
