@@ -110,7 +110,7 @@
     "@dashkite/genie-clean": "0.13.1",
     "@dashkite/genie-coffee": "0.13.1",
     "@dashkite/genie-module": "^0.5.51",
-    "@dashkite/genie-release": "^0.5.11",
+    "@dashkite/genie-release": "^0.5.10",
     "@dashkite/genie-yaml": "0.11.1",
     "@dashkite/runner": "^0.1.20"
   },
