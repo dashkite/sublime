@@ -105,14 +105,14 @@
   "devDependencies": {
     "@dashkite/amen": "^0.9.27",
     "@dashkite/amen-console": "^0.8.24",
-    "@dashkite/assert": "^0.7.28",
+    "@dashkite/assert": "^0.7.29",
     "@dashkite/genie": "0.20.4",
     "@dashkite/genie-clean": "0.13.1",
     "@dashkite/genie-coffee": "0.13.1",
-    "@dashkite/genie-module": "^0.5.53",
-    "@dashkite/genie-release": "^0.5.13",
+    "@dashkite/genie-module": "^0.5.54",
+    "@dashkite/genie-release": "^0.5.14",
     "@dashkite/genie-yaml": "0.11.1",
-    "@dashkite/runner": "^0.1.22"
+    "@dashkite/runner": "^0.1.23"
   },
   "dependencies": {
     "@dashkite/athena": "^0.0.12",
