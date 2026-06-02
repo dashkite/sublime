@@ -115,7 +115,7 @@
     "@dashkite/runner": "^0.1.20"
   },
   "dependencies": {
-    "@dashkite/athena": "link:../athena",
+    "@dashkite/athena": "^0.0.12",
     "@dashkite/generic": "0.9.1",
     "@dashkite/http-headers": "^0.12.46",
     "@dashkite/joy": "^0.12.34",
