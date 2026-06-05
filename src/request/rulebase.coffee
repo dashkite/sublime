@@ -115,7 +115,7 @@ rules
     name: "set headers"
     when: [ "!headers ready" ]
     run: ->
-      @working.headers ?= MutableFields.make ( @input.headers ? {} )
+      @working.headers ?= MutableFields.make ( @input.headers ? {})
       @output.headers = @working.headers.data
       
   .action
