@@ -1,15 +1,4 @@
-import * as Fn from "@dashkite/joy/function"
-import * as Time from "@dashkite/joy/time"
-import * as Obj from "@dashkite/joy/object"
 import { metaclass } from "@dashkite/joy/metaclass"
-import { Queue } from "@dashkite/joy/iterable"
-import Generic from "@dashkite/generic"
-
-start = ( reactor ) ->
-  done = false
-  while !done
-    { value, done } = await reactor.next()
-  value
 
 builder = ( T ) ->
 
@@ -32,7 +21,17 @@ builder = ( T ) ->
       self
 
     @getters
-      rules: -> Fn.pipe @constructor._rulebases
+      rules: ->
+        rulebases = @constructor._rulebases
+        start: ( state, options = {} ) ->
+          reactor = options.delegator
+          for rulebase in rulebases
+            reactor = rulebase.start state, { options..., delegator: reactor }
+          reactor
+        run: ( state, options = {} ) ->
+          for rulebase in rulebases
+            state = await rulebase.run state, options
+          state
 
     update: ( mutator ) ->
       @output = {}
@@ -46,7 +45,7 @@ builder = ( T ) ->
       mulligan = true
       loop
         state = { @input, @output, @errors, @working }
-        { @output, @errors, @working } = await start @rules.apply state
+        { @output, @errors, @working } = await @rules.run state
         if @errors.length == 0
           break
         else if mulligan
