@@ -27,10 +27,8 @@ do ->
 
       $ = Sublime.make()
 
-      Runner
-
+      results = await Runner
         .make scenarios
-
         .apply
 
           "Request Builder": 
@@ -67,6 +65,24 @@ do ->
             "response":
               "*": ({ input: { body, options }}) ->
                 convert "sublime", new Response body, options
+
+      results.push await test "Iterator Delegation", ->
+        $ = Sublime.make()
+        builder = $.Request.Builder.make url: "http://example.com"
+        state = { input: builder.input, output: {}, errors: [], working: {} }
+        
+        events = []
+        mockDelegator = do ->
+          yield { name: "mock-event", state }
+          
+        reactor = builder.rules.start state, delegator: mockDelegator
+        for await event from reactor
+          events.push event
+        
+        assert.equal events[0].name, "mock-event"
+
+      results
+
 
 
   process.exit if success then 0 else 1

@@ -1,98 +1,290 @@
 # Reference
 
+## Concepts
+
+Sublime utilizes a rule-based inference engine to convert various colloquial forms of HTTP structures into a specific target form, by passing through a canonical Sublime form. Instead of manually specifying every header and parameter, creators provide a minimal, colloquial request or response that expresses their high-level intent. Sublime then infers the necessary details to construct a robust, canonical representation. 
+
+This process relies heavily on a builder pattern intertwined with the Athena rules engine. Builders collect initial colloquial inputs and evaluate them against registered rulebases. Once the engine reaches equilibrium, the builder emits a finalized `Value` object representing the fully resolved, canonical request or response. Finally, creators can transform these canonical `Value` objects into environment-specific target formats (such as the standard Web Fetch `Request` or `Response` objects) using the provided `convert` capability.
+
 ## Sublime
 
 ### make
 $make: rulebases \to sublime$
 
-Creates a Sublime instance with the given rulebases. Returns an object containing `Request` and `Response` constructors.
+Initializes a factory object containing `Request` and `Response` builders. By passing an array of rulebases, developers inject custom logic into the inference engine, allowing it to handle domain-specific content types, headers, or authorization schemes natively.
 
-```coffee
-{ Request, Response } = Sublime.make()
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+$ = Sublime.make []
+assert.ok $.Request.Builder
 ```
 
-## Request
+## Request.Builder
 
-### Request.Builder.make
+### make
 $make: input \to builder$
 
-Creates a new request builder with the given input.
+Instantiates a new request builder initialized with a colloquial `input` configuration. The builder acts as the entry point for the Athena rules engine, gathering this initial colloquial context before processing.
 
-### Request.Builder.get
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Request } = Sublime.make()
+builder = Request.Builder.make url: "https://example.com"
+
+assert.equal builder.input.url, "https://example.com"
+```
+
+### get
 $get: \dashrightarrow request$
 
-Asynchronously processes the input through the rulebases and returns a `Request.Value`.
+Processes the accumulated inputs asynchronously through the configured rulebases, generating the finalized `Request.Value`. During this phase, the internal engine infers missing headers, normalizes methods, and serializes payloads.
 
-### Request.Value.url
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Request } = Sublime.make()
+request = await Request.Builder.make( url: "https://example.com", method: "POST" ).get()
+
+assert.equal request.method, "POST"
+```
+
+## Request.Value
+
+### url
 $url \to xurl$
 
-The request URL.
+Returns the canonical URL representing the target endpoint of the request. The value is normalized to ensure structural consistency.
 
-### Request.Value.method
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Request } = Sublime.make()
+request = await Request.Builder.make( url: "https://example.com" ).get()
+
+assert.equal request.url.toString(), "https://example.com/"
+```
+
+### method
 $method \to string$
 
-The normalized request method.
+Returns the normalized HTTP method for the request. Sublime handles casing ensuring that methods conform to standard HTTP semantics.
 
-### Request.Value.headers
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Request } = Sublime.make()
+request = await Request.Builder.make( url: "https://example.com", method: "post" ).get()
+
+assert.equal request.method, "POST"
+```
+
+### headers
 $headers \to fields$
 
-The request headers.
+Returns a collection representing the HTTP headers attached to the request. This collection manages the complexities of header cardinality, such as merging list headers and enforcing single-valued constraints.
 
-### Request.Value.content
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Request } = Sublime.make()
+request = await Request.Builder.make( url: "https://example.com", headers: { "X-Test": "123" } ).get()
+
+assert.equal request.headers.get("X-Test"), "123"
+```
+
+### content
 $content \to any$
 
-The request content, automatically deserialized based on the `content-type` header.
+Returns the request body content. Sublime deserializes this content automatically based on the inferred or explicitly defined `content-type` header.
 
-## Response
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
 
-### Response.Builder.make
+{ Request } = Sublime.make()
+request = await Request.Builder.make( url: "https://example.com", content: { hello: "world" } ).get()
+
+assert.deepEqual request.content, { hello: "world" }
+```
+
+## Response.Builder
+
+### make
 $make: input \to builder$
 
-Creates a new response builder with the given input.
+Instantiates a new response builder initialized with a colloquial `input` configuration, establishing the baseline state for inference.
 
-### Response.Builder.get
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Response } = Sublime.make()
+builder = Response.Builder.make status: 200
+
+assert.equal builder.input.status, 200
+```
+
+### get
 $get: \dashrightarrow response$
 
-Asynchronously processes the input through the rulebases and returns a `Response.Value`.
+Processes the accumulated inputs asynchronously through the configured rulebases, returning the finalized `Response.Value`.
 
-### Response.Value.status
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Response } = Sublime.make()
+response = await Response.Builder.make( status: 404 ).get()
+
+assert.equal response.status, 404
+```
+
+## Response.Value
+
+### status
 $status \to number$
 
-The response status code.
+Returns the precise HTTP status code of the response.
 
-### Response.Value.ok
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Response } = Sublime.make()
+response = await Response.Builder.make( status: 201 ).get()
+
+assert.equal response.status, 201
+```
+
+### ok
 $ok \to boolean$
 
-True if the status code is in the 2xx range.
+Evaluates whether the response represents a successful operation. It returns `true` if the status code falls within the `2xx` range.
 
-### Response.Value.description
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Response } = Sublime.make()
+response = await Response.Builder.make( status: 204 ).get()
+
+assert.equal response.ok, true
+```
+
+### description
 $description \to string$
 
-The status description.
+Returns a human-readable phrase describing the status code, assisting in logging and debugging flows.
 
-### Response.Value.headers
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Response } = Sublime.make()
+response = await Response.Builder.make( status: 200 ).get()
+
+assert.equal response.description, "OK"
+```
+
+### headers
 $headers \to fields$
 
-The response headers.
+Returns a collection representing the HTTP headers attached to the response.
 
-### Response.Value.content
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Response } = Sublime.make()
+response = await Response.Builder.make( status: 200, headers: { "X-Response": "456" } ).get()
+
+assert.equal response.headers.get("X-Response"), "456"
+```
+
+### content
 $content \to any$
 
-The response content, automatically deserialized based on the `content-type` header.
+Returns the response body content, automatically deserialized according to the response's `content-type` header.
+
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Response } = Sublime.make()
+response = await Response.Builder.make( status: 200, content: { status: "success" } ).get()
+
+assert.deepEqual response.content, { status: "success" }
+```
 
 ## Fields
 
 ### get
 $get: name \to value$
 
-Retrieves the value of the named header, automatically parsed.
+Retrieves the value associated with the specified header field name, resolving any underlying structural nuances like comma-separated lists.
 
-## convert
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+
+{ Request } = Sublime.make()
+request = await Request.Builder.make( url: "https://example.com", headers: { "Accept": "application/json" } ).get()
+
+assert.equal request.headers.get("Accept"), "application/json"
+```
+
+## Convert
+
+### convert
 $convert: target, value \dashrightarrow result$
 
-Converts a Sublime value to the target format.
+Translates a Sublime internal structure into a specialized format required by a `target` system. It currently translates directly to standard `fetch` structures, enabling seamless integration with native web APIs.
 
-```coffee
-# Convert a Sublime request to a Fetch request
+```coffeescript
+import assert from "node:assert"
+import Sublime from "@dashkite/sublime"
+import convert from "@dashkite/sublime/src/convert"
+
+{ Request } = Sublime.make()
+request = await Request.Builder.make( url: "https://example.com" ).get()
 fetchRequest = await convert "fetch", request
+
+assert.ok fetchRequest instanceof global.Request
 ```
+
+## Header Cardinality
+
+> [!WARNING]
+>
+> This document’s accuracy is suspect and should be cross-checked against [the specification](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.1).
+
+List headers are multi-valued headers, which often allow for comma-separated values or headers that may appear more than once (which tacitly append new values).
+
+### Content Negotiation
+
+`Accept`, `Accept-Charset`, `Accept-Encoding`, `Accept-Language`, `Accept-Ranges`
+
+### Control
+
+`Allow`, `Cache-Control`, `Connection`, `Expect`, `Forwarded`, `Range`, `TE`, `Trailer`, `Transfer-Encoding`, `Upgrade`, `Vary`
+
+### Authentication And Metadata
+
+`WWW-Authenticate`, `Proxy-Authenticate`, `If-Match`, `If-None-Match`, `Accept-Patch`, `Accept-CH`, `IM`, `Preference-Applied`
+
+### Unary (Single-Valued) Headers
+
+`Authorization`, `Content-Length`, `Content-Type`, `Content-MD5`, `Date`, `ETag`, `Expires`, `Last-Modified`, `Location`, `Host`, `Origin`, `Referer`, `Retry-After`, `Server`, `User-Agent`, `Warning`, `Pragma`
+
+### Cookies
+
+- `Cookie` uses semicolon-separated name-value pairs within a single header line and does **not** follow comma-list syntax.
+- `Set-Cookie` must be repeated as separate header fields—attempts to combine multiple `Set-Cookie` values into one comma-separated line are deprecated and widely unsupported.

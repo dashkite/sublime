@@ -4,25 +4,31 @@
 
 [![Hippocratic License HL3-CORE](https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-CORE&labelColor=5e2751&color=bc8c3d)](https://firstdonoharm.dev/version/3/0/core.html)
 
-## Purpose
+Sublime provides a rule-based system for reliably inferring the details of an HTTP request or response based on the available context. It handles URL construction, header management, content-type inference, and serialization.
 
-Sublime provides a rule-based system for reliably inferring the details of an HTTP request or response based on the available context. It handles URL construction, header management, content-type inference, and serialization/deserialization.
+## Features
 
-The rulebase is modular, allowing rule "modules" to be added to improve Sublime's ability to enrich requests and responses.
+- Constructs URLs robustly from partial inputs.
+- Manages HTTP headers, including lists and single-valued variations.
+- Infers content types based on data structures.
+- Provides automatic serialization and deserialization of payloads.
+- Converts structures between canonical representations and standard Web Fetch structures.
 
 ## Installation
 
-Use your favorite package manager to install `@dashkite/sublime`.
+```bash
+pnpm install @dashkite/sublime
+```
 
 ## Usage
 
-```coffee
+Sublime works by creating a unified interface for composing HTTP requests and responses.
+
+```coffeescript
 import Sublime from "@dashkite/sublime"
 
-# Create a Sublime instance with default rules
 { Request, Response } = Sublime.make()
 
-# Build a request
 request = await Request.Builder
   .make
     url: "https://example.com/api"
@@ -30,16 +36,12 @@ request = await Request.Builder
     content: { hello: "world" }
   .get()
 
-console.log request.url.toString() # https://example.com/api
-console.log request.method # post (normalized)
-console.log request.headers.get "content-type" # application/json (inferred)
-console.log request.content # { hello: "world" } (deserialized from JSON string in output)
+console.log request.url.toString()
 ```
 
 ## Other Resources
 
 - [Reference](docs/reference.md)
-
-## Status
-
-Not suitable for production use. Please report bugs and feature requests via the issue tracker.
+- [Recipes](docs/recipes.md)
+- [Technical Notes](docs/technical-notes.md)
+- [Testing](docs/testing.md)
