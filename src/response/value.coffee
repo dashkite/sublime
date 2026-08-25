@@ -38,7 +38,7 @@ class Value extends metaclass()
     description: -> @output.description
 
     content: -> 
-      if (typeof @output.content === "string") && isJSON @headers.get "content-type"
+      if ( typeof @output.content is "string" ) and isJSON @headers.get "content-type"
         JSON.parse @output.content
       else
         @output.content
