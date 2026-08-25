@@ -21,7 +21,7 @@ class Value extends metaclass()
     headers: -> Fields.make @output.headers
 
     content: -> 
-      if isJSON @headers.get "content-type"
+      if (typeof @output.content === "string") && isJSON @headers.get "content-type"
         JSON.parse @output.content
       else
         @output.content
