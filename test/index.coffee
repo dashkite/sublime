@@ -10,6 +10,7 @@ import Sublime from "../src"
 import convert from "../src/convert"
 
 import scenarios from "./scenarios"
+import generative from "./generative"
 
 do ->
 
@@ -80,6 +81,8 @@ do ->
           events.push event
         
         assert.equal events[0].name, "mock-event"
+
+      results.push await generative()
 
       results
 
