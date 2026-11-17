@@ -75,7 +75,14 @@ rules
     name: "authorization is well-formed"
     when: [ "has authorization" ]
     run: ->
-      Type.isArray ( @input.authorization ? @working.authorization )
+      list = @input.authorization ? @working.authorization
+      ( Type.isArray list ) &&
+        list.every ( item ) ->
+          ( Type.isObject item ) &&
+          ( Type.isObject item.challenge ) &&
+          ( Type.isString item.challenge.scheme ) &&
+          ( item.challenge.scheme.length > 0 ) &&
+          (( !item.query? ) || ( Type.isObject item.query ))
 
   .condition
     name: "authorization header ready"
@@ -127,17 +134,7 @@ rules
     run: ->
       authorizers = await Registry.get "authorizers"
       context = { url: @output.url, method: @output.method }
-      # normalize specifier: can be text (the scheme) or a challenge 
-      # (has a `scheme` property) or challenge and query
       specifiers = ( @input.authorization ? @working.authorization )
-        .map ( value ) ->
-          if value.challenge?
-            value
-          else if value.scheme?
-            challenge: value
-          else
-            challenge: 
-              scheme: value
         .map ({ query, rest... }) -> { rest..., query: { query..., context... }}
       if ( authorization = await authorizers.authorization specifiers )?
         @working.headers.set "authorization", authorization

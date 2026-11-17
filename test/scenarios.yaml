@@ -98,10 +98,50 @@
             scheme: foo
             token: "123"
 
+    - name: with authorization and query
+      input:
+        url: "https://foobar.com/hello?name=world"
+        authorization:
+          - challenge:
+              scheme: foo
+            query:
+              scope: read
+      assertions:
+        - path: $.headers.get "authorization"
+          type: deepEqual
+          expect:
+            scheme: foo
+            token: "123"
+
     - name: ill-formed authorization
       input:
         url: "https://foobar.com/hello"
         authorization: "bearer"
+      rejects: >-
+        sublime: ill-formed authorization
+
+    - name: ill-formed authorization (string element)
+      input:
+        url: "https://foobar.com/hello"
+        authorization:
+          - "bearer"
+      rejects: >-
+        sublime: ill-formed authorization
+
+    - name: ill-formed authorization (bare challenge element)
+      input:
+        url: "https://foobar.com/hello"
+        authorization:
+          - scheme: bearer
+      rejects: >-
+        sublime: ill-formed authorization
+
+    - name: ill-formed authorization (empty scheme)
+      input:
+        url: "https://foobar.com/hello"
+        authorization:
+          - challenge:
+              scheme: ""
       rejects: >-
         sublime: ill-formed authorization
 
@@ -127,6 +167,24 @@
         - path: $.status
           type: equal
           expect: 200
+
+    - name: rfc 8288 link header
+      input:
+        request:
+          url: "https://kite.dashkite.io/accounts"
+        status: 202
+        headers:
+          link: '<https://kite.dashkite.io/tickets/t1>; rel="self", <https://kite.dashkite.io/accounts/a1>; rel="target"'
+      assertions:
+        - path: $.headers.get "link"
+          type: deepEqual
+          expect:
+            - uri: "https://kite.dashkite.io/tickets/t1"
+              parameters:
+                rel: self
+            - uri: "https://kite.dashkite.io/accounts/a1"
+              parameters:
+                rel: target
 
     - name: description only
       input:

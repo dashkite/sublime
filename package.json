@@ -119,7 +119,7 @@
   "dependencies": {
     "@dashkite/athena": "link:../athena",
     "@dashkite/generic": "0.9.32",
-    "@dashkite/http-headers": "0.12.37",
+    "@dashkite/http-headers": "link:../http-headers",
     "@dashkite/joy": "link:../joy",
     "@dashkite/media-type": "0.9.0",
     "@dashkite/reactive": "0.7.33",
