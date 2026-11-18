@@ -145,6 +145,59 @@
       rejects: >-
         sublime: ill-formed authorization
 
+    - name: with multi-byte utf-8 markdown content
+      input:
+        url: "https://foobar.com/prompts"
+        method: POST
+        content: "I’d like to develop a simple blogging application."
+        headers:
+          content-type: text/markdown
+      assertions:
+        - path: ( $.headers.get "content-type" ).data
+          type: deepEqual
+          expect:
+            type: text
+            subtype: markdown
+        - path: $.content.length
+          type: equal
+          expect: 50
+        - path: $.headers.get "content-length"
+          type: equal
+          expect: 52
+        - path: ( $.headers.get "content-length" ) - $.content.length
+          type: equal
+          expect: 2
+        - path: $.content
+          type: equal
+          expect: "I’d like to develop a simple blogging application."
+
+    - name: with multi-byte utf-8 json content
+      input:
+        url: "https://foobar.com/prompts"
+        method: POST
+        content:
+          prompt: "I’d like to develop a simple blogging application."
+          author: "Zoë 👋"
+        headers:
+          content-type: application/json
+      assertions:
+        - path: ( $.headers.get "content-type" ).data
+          type: deepEqual
+          expect:
+            type: application
+            subtype: json
+        - path: $.data.content.length
+          type: equal
+          expect: 81
+        - path: $.headers.get "content-length"
+          type: equal
+          expect: 86
+        - path: $.content
+          type: deepEqual
+          expect:
+            prompt: "I’d like to develop a simple blogging application."
+            author: "Zoë 👋"
+
 - name: Response
   scenarios:
 
@@ -272,6 +325,71 @@
           expect:
             greeting: hello
 
+    - name: multi-byte utf-8 markdown content
+      input:
+        request:
+          url: "https://foobar.com/prompts"
+          headers:
+            accept:
+              - type: text
+                subtype: markdown
+        headers:
+          content-type: text/markdown
+        content: "I’d like to develop a simple blogging application."
+      assertions:
+        - path: $.status
+          type: equal
+          expect: 200
+        - path: ( $.headers.get "content-type" ).data
+          type: deepEqual
+          expect:
+            type: text
+            subtype: markdown
+        - path: $.content.length
+          type: equal
+          expect: 50
+        - path: $.headers.get "content-length"
+          type: equal
+          expect: 52
+        - path: ( $.headers.get "content-length" ) - $.content.length
+          type: equal
+          expect: 2
+        - path: $.content
+          type: equal
+          expect: "I’d like to develop a simple blogging application."
+
+    - name: multi-byte utf-8 json content
+      input:
+        request:
+          url: "https://foobar.com/prompts"
+          headers:
+            accept:
+              - type: application
+                subtype: json
+        content:
+          prompt: "I’d like to develop a simple blogging application."
+          author: "Zoë 👋"
+      assertions:
+        - path: $.status
+          type: equal
+          expect: 200
+        - path: ( $.headers.get "content-type" ).data
+          type: deepEqual
+          expect:
+            type: application
+            subtype: json
+        - path: $.data.content.length
+          type: equal
+          expect: 81
+        - path: $.headers.get "content-length"
+          type: equal
+          expect: 86
+        - path: $.content
+          type: deepEqual
+          expect:
+            prompt: "I’d like to develop a simple blogging application."
+            author: "Zoë 👋"
+
     - name: unsupported media type
       input:
         request:
@@ -305,6 +423,21 @@
               type: equal
               expect: "https://foobar.com/hello?name=world"
 
+        - name: multi-byte utf-8 markdown
+
+          input:
+            url: "https://foobar.com/prompts"
+            method: POST
+            content: "I’d like to develop a simple blogging application."
+            headers:
+              content-type: text/markdown
+
+          assertions:
+
+            - path: $.headers.get "content-length"
+              type: equal
+              expect: "52"
+
 
     - name: response
 
@@ -324,3 +457,45 @@
             - path: $.status
               type: equal
               expect: 200
+
+        - name: multi-byte utf-8 markdown
+
+          input:
+            body: "I’d like to develop a simple blogging application."
+            options:
+              status: 200
+              headers:
+                "content-type": "text/markdown"
+
+          assertions:
+
+            - path: $.status
+              type: equal
+              expect: 200
+
+            - path: $.headers.get "content-length"
+              type: equal
+              expect: 52
+
+            - path: $.content
+              type: equal
+              expect: "I’d like to develop a simple blogging application."
+
+        - name: binary octet-stream byte length
+
+          input:
+            body: "I’d like to develop a simple blogging application."
+            options:
+              status: 200
+              headers:
+                "content-type": "application/octet-stream"
+
+          assertions:
+
+            - path: $.status
+              type: equal
+              expect: 200
+
+            - path: $.headers.get "content-length"
+              type: equal
+              expect: 52

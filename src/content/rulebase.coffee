@@ -6,6 +6,16 @@ import equal from "#helpers/equal"
 
 import State from "#state"
 
+byteLength = ( content ) ->
+  if Type.isString content
+    ( new TextEncoder() ).encode( content ).byteLength
+  else if ( ArrayBuffer.isView content ) || ( content instanceof ArrayBuffer )
+    content.byteLength
+  else if ( typeof Blob != "undefined" ) && ( content instanceof Blob )
+    content.size
+  else
+    content.length
+
 rules = Athena.make
 
   initialize: ( state ) -> State.make state
@@ -168,7 +178,7 @@ rules
       "content ready"
     ]
     run: -> 
-      @working.headers.set "content-length", @output.content.length
+      @working.headers.set "content-length", byteLength @output.content
       @output.headers = @working.headers.data
 
   .action
